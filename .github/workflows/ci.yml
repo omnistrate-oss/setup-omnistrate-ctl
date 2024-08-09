@@ -62,6 +62,11 @@ jobs:
         id: test-action
         uses: ./
 
+      - name: Test Local Action CTL
+        run: |
+          omnistrate-ctl --version
+          omctl --help
+
   test-action-with-version:
     name: GitHub Actions Test with Version
 
@@ -82,7 +87,7 @@ jobs:
         with:
           version: latest
 
-      - name: Test Local Action with Version
+      - name: Test Local Action CTL
         run: |
           omnistrate-ctl --version
           omctl --help
@@ -108,7 +113,7 @@ jobs:
           email: 'test'
           password: 'test'
 
-      - name: Test Local Action with Version
+      - name: Test Local Action CTL
         run: |
           omnistrate-ctl --version
           omctl --help
