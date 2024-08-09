@@ -28892,21 +28892,22 @@ async function install() {
     try {
         // Resolve the url for the requested version
         const url = resolveUrl(constants_1.PLATFORM, constants_1.ARCHITECTURE, constants_1.VERSION);
-        core.info(`Resolved url: ${url}`);
+        core.debug(`Resolved url: ${url}`);
         // Install the resolved version if necessary
         const toolPath = toolCache.find('omnistrate-ctl', constants_1.VERSION, constants_1.ARCHITECTURE);
         if (toolPath) {
             core.addPath(toolPath);
         }
         else {
-            await installOctl(url, constants_1.VERSION);
+            await installCtl(url, constants_1.VERSION);
         }
         // Check the version of the installed tool
-        const exitCode = await exec.exec('omnistrate-ctl --version');
-        if (exitCode !== 0) {
+        const exitCode = await exec.getExecOutput('omnistrate-ctl --version');
+        if (exitCode.exitCode !== 0) {
             core.setFailed('Failed to check the version of the installed');
             return;
         }
+        core.info(exitCode.stdout);
         // Login to the Omnistrate CLI with the provided credentials
         const email = core.getInput('email');
         const password = core.getInput('password');
@@ -28934,14 +28935,14 @@ function resolveUrl(platform, architecture, version) {
     }
     return url;
 }
-async function installOctl(url, version) {
+async function installCtl(url, version) {
     const downloadedPath = await toolCache.downloadTool(url);
-    core.info(`Acquired omnistrate-ctl ${version} from ${url}`);
-    const cachedPath = await toolCache.cacheDir(downloadedPath, 'omnistrate-ctl', version);
+    core.info(`Acquired omnistrate-ctl:${version} from ${url}`);
+    const cachedPath = await toolCache.cacheFile(downloadedPath, 'omnistrate-ctl', 'omnistrate-ctl', version);
     core.info(`Successfully cached omnistrate-ctl to ${cachedPath}`);
     core.addPath(cachedPath);
     core.info('Added omnistrate-ctl to the path');
-    const cachedPathAlias = await toolCache.cacheDir(downloadedPath, 'omctl', version);
+    const cachedPathAlias = await toolCache.cacheFile(downloadedPath, 'omctl', 'omctl', version);
     core.info(`Successfully cached omctl to ${cachedPathAlias}`);
     core.addPath(cachedPath);
     core.info('Added omctl to the path');

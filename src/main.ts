@@ -17,15 +17,16 @@ export async function install(): Promise<void> {
     if (toolPath) {
       core.addPath(toolPath)
     } else {
-      await installOctl(url, VERSION)
+      await installCtl(url, VERSION)
     }
 
     // Check the version of the installed tool
-    const exitCode = await exec.exec('omnistrate-ctl --version')
-    if (exitCode !== 0) {
+    const exitCode = await exec.getExecOutput('omnistrate-ctl --version')
+    if (exitCode.exitCode !== 0) {
       core.setFailed('Failed to check the version of the installed')
       return
     }
+    core.info(exitCode.stdout)
 
     // Login to the Omnistrate CLI with the provided credentials
     const email = core.getInput('email')
@@ -58,24 +59,26 @@ function resolveUrl(
   return url
 }
 
-async function installOctl(url: string, version: string): Promise<void> {
+async function installCtl(url: string, version: string): Promise<void> {
   const downloadedPath = await toolCache.downloadTool(url)
   core.info(`Acquired omnistrate-ctl:${version} from ${url}`)
-  const cachedPath = await toolCache.cacheDir(
+  const cachedPath = await toolCache.cacheFile(
     downloadedPath,
+    'omnistrate-ctl',
     'omnistrate-ctl',
     version
   )
   core.info(`Successfully cached omnistrate-ctl to ${cachedPath}`)
   core.addPath(cachedPath)
   core.info('Added omnistrate-ctl to the path')
-  const cachedPathAlias = await toolCache.cacheDir(
+  const cachedPathAlias = await toolCache.cacheFile(
     downloadedPath,
+    'omctl',
     'omctl',
     version
   )
   core.info(`Successfully cached omctl to ${cachedPathAlias}`)
-  core.addPath(cachedPath)
+  core.addPath(cachedPathAlias)
   core.info('Added omctl to the path')
 }
 
