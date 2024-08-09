@@ -9,7 +9,7 @@ export const ARCHITECTURE = (() => {
       return 'arm64'
     }
     case 'x64': {
-      return 'x86_64'
+      return 'amd64'
     }
     default: {
       throw new Error(arch)
@@ -21,13 +21,13 @@ export const PLATFORM = (() => {
   const platform = process.platform
   switch (platform) {
     case 'darwin': {
-      return 'macOS'
+      return 'darwin'
     }
     case 'linux': {
-      return 'Linux'
+      return 'linux'
     }
     case 'win32': {
-      return 'Windows'
+      return 'windows'
     }
     default: {
       throw new Error(platform)

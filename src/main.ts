@@ -48,7 +48,10 @@ function resolveUrl(
   version: string
 ): string {
   let url = `https://github.com/omnistrate/cli/releases/download/${version}/omnistrate-ctl-${platform}-${architecture}`
-  if (platform === 'Windows') {
+  if (version === 'latest') {
+    url = `https://github.com/omnistrate/cli/releases/latest/download/omnistrate-ctl-${platform}-${architecture}`
+  }
+  if (platform === 'windows') {
     url += '.exe'
   }
   return url
@@ -60,8 +63,7 @@ async function installOctl(url: string, version: string): Promise<void> {
   const cachedPath = await toolCache.cacheDir(
     downloadedPath,
     'omnistrate-ctl',
-    version,
-    ARCHITECTURE
+    version
   )
   core.info(`Successfully cached omnistrate-ctl to ${cachedPath}`)
   core.addPath(cachedPath)
@@ -91,12 +93,17 @@ async function login(email: string, password: string): Promise<void> {
 
 export async function logout(): Promise<void> {
   try {
-    const exitCode = await exec.exec('omnistrate-ctl logout')
-    if (exitCode !== 0) {
-      core.setFailed('Failed to logout of Omnistrate CLI')
-      return
+    const toolPath = toolCache.find('omnistrate-ctl', VERSION, ARCHITECTURE)
+    if (toolPath) {
+      const exitCode = await exec.exec('omnistrate-ctl logout')
+      if (exitCode !== 0) {
+        core.setFailed('Failed to logout of Omnistrate CLI')
+        return
+      }
+      console.log('Logged out of Omnistrate CLI')
+    } else {
+      console.log('Omnistrate CLI is not installed')
     }
-    console.log('Logged out of Omnistrate CLI')
   } catch (error) {
     console.log('Failed to logout of Omnistrate CLI - ', error)
   }
