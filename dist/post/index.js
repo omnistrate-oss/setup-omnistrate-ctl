@@ -28949,10 +28949,12 @@ async function installCtl(url, version) {
     }
     const cachedPath = await toolCache.cacheFile(downloadedPath, `omnistrate-ctl${extension}`, 'omnistrate-ctl', version);
     core.debug(`Successfully cached omnistrate-ctl to ${cachedPath}`);
-    const cachedPathAlias = await toolCache.cacheFile(downloadedPath, `omctl${extension}`, 'omnistrate-ctl', version);
-    core.debug(`Successfully cached omctl to ${cachedPathAlias}`);
     core.addPath(cachedPath);
     core.debug('Added omnistrate-ctl to the path');
+    const cachedPathAlias = await toolCache.cacheFile(downloadedPath, `omctl${extension}`, 'omctl', version);
+    core.debug(`Successfully cached omctl to ${cachedPathAlias}`);
+    core.addPath(cachedPathAlias);
+    core.debug('Added omctl to the path');
     // List the contents of the toolPath directory
     fs.readdir(cachedPath, (err, files) => {
         if (err) {
