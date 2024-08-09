@@ -13,15 +13,19 @@ export async function install(): Promise<void> {
     const url = resolveUrl(PLATFORM, ARCHITECTURE, VERSION)
     core.debug(`Resolved url: ${url}`)
     // Install the resolved version if necessary
-    const toolPath = toolCache.find('omnistrate-ctl', VERSION, ARCHITECTURE)
+    let toolPath = toolCache.find('omnistrate-ctl', VERSION)
     if (toolPath) {
       core.addPath(toolPath)
     } else {
-      await installCtl(url, VERSION)
+      toolPath = await installCtl(url, VERSION)
     }
 
     // Check the version of the installed tool
-    const exitCode = await exec.getExecOutput('omnistrate-ctl --version')
+    let execPath = `${toolPath}/omnistrate-ctl`
+    if (PLATFORM === 'windows') {
+      execPath += '.exe'
+    }
+    const exitCode = await exec.getExecOutput(execPath, ['--version'])
     if (exitCode.exitCode !== 0) {
       core.setFailed('Failed to check the version of the installed')
       return
@@ -59,25 +63,30 @@ function resolveUrl(
   return url
 }
 
-async function installCtl(url: string, version: string): Promise<void> {
+async function installCtl(url: string, version: string): Promise<string> {
   const downloadedPath = await toolCache.downloadTool(url)
   core.info(`Acquired omnistrate-ctl:${version} from ${url}`)
+  let extension = ''
+  if (PLATFORM === 'windows') {
+    extension = '.exe'
+  }
   const cachedPath = await toolCache.cacheFile(
     downloadedPath,
-    'omnistrate-ctl',
+    `omnistrate-ctl${extension}`,
     'omnistrate-ctl',
     version
   )
   core.debug(`Successfully cached omnistrate-ctl to ${cachedPath}`)
   const cachedPathAlias = await toolCache.cacheFile(
     downloadedPath,
-    'omctl',
+    `omctl${extension}`,
     'omnistrate-ctl',
     version
   )
-  core.info(`Successfully cached omctl to ${cachedPathAlias}`)
+  core.debug(`Successfully cached omctl to ${cachedPathAlias}`)
   core.addPath(cachedPath)
-  core.info('Added omnistrate-ctl to the path')
+  core.debug('Added omnistrate-ctl to the path')
+  return cachedPath
 }
 
 async function login(email: string, password: string): Promise<void> {

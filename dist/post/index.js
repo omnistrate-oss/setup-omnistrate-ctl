@@ -28894,15 +28894,19 @@ async function install() {
         const url = resolveUrl(constants_1.PLATFORM, constants_1.ARCHITECTURE, constants_1.VERSION);
         core.debug(`Resolved url: ${url}`);
         // Install the resolved version if necessary
-        const toolPath = toolCache.find('omnistrate-ctl', constants_1.VERSION, constants_1.ARCHITECTURE);
+        let toolPath = toolCache.find('omnistrate-ctl', constants_1.VERSION);
         if (toolPath) {
             core.addPath(toolPath);
         }
         else {
-            await installCtl(url, constants_1.VERSION);
+            toolPath = await installCtl(url, constants_1.VERSION);
         }
         // Check the version of the installed tool
-        const exitCode = await exec.getExecOutput('omnistrate-ctl --version');
+        let execPath = `${toolPath}/omnistrate-ctl`;
+        if (constants_1.PLATFORM === 'windows') {
+            execPath += '.exe';
+        }
+        const exitCode = await exec.getExecOutput(execPath, ['--version']);
         if (exitCode.exitCode !== 0) {
             core.setFailed('Failed to check the version of the installed');
             return;
@@ -28938,12 +28942,17 @@ function resolveUrl(platform, architecture, version) {
 async function installCtl(url, version) {
     const downloadedPath = await toolCache.downloadTool(url);
     core.info(`Acquired omnistrate-ctl:${version} from ${url}`);
-    const cachedPath = await toolCache.cacheFile(downloadedPath, 'omnistrate-ctl', 'omnistrate-ctl', version);
+    let extension = '';
+    if (constants_1.PLATFORM === 'windows') {
+        extension = '.exe';
+    }
+    const cachedPath = await toolCache.cacheFile(downloadedPath, `omnistrate-ctl${extension}`, 'omnistrate-ctl', version);
     core.debug(`Successfully cached omnistrate-ctl to ${cachedPath}`);
-    const cachedPathAlias = await toolCache.cacheFile(downloadedPath, 'omctl', 'omnistrate-ctl', version);
-    core.info(`Successfully cached omctl to ${cachedPathAlias}`);
+    const cachedPathAlias = await toolCache.cacheFile(downloadedPath, `omctl${extension}`, 'omnistrate-ctl', version);
+    core.debug(`Successfully cached omctl to ${cachedPathAlias}`);
     core.addPath(cachedPath);
-    core.info('Added omnistrate-ctl to the path');
+    core.debug('Added omnistrate-ctl to the path');
+    return cachedPath;
 }
 async function login(email, password) {
     try {
