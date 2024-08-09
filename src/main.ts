@@ -11,7 +11,7 @@ export async function install(): Promise<void> {
   try {
     // Resolve the url for the requested version
     const url = resolveUrl(PLATFORM, ARCHITECTURE, VERSION)
-    core.info(`Resolved url: ${url}`)
+    core.debug(`Resolved url: ${url}`)
     // Install the resolved version if necessary
     const toolPath = toolCache.find('omnistrate-ctl', VERSION, ARCHITECTURE)
     if (toolPath) {
@@ -31,6 +31,7 @@ export async function install(): Promise<void> {
     const email = core.getInput('email')
     const password = core.getInput('password')
     if (email && password) {
+      //core.setSecret(password)
       login(email, password)
     }
   } catch (error) {
@@ -59,7 +60,7 @@ function resolveUrl(
 
 async function installOctl(url: string, version: string): Promise<void> {
   const downloadedPath = await toolCache.downloadTool(url)
-  core.info(`Acquired omnistrate-ctl ${version} from ${url}`)
+  core.info(`Acquired omnistrate-ctl:${version} from ${url}`)
   const cachedPath = await toolCache.cacheDir(
     downloadedPath,
     'omnistrate-ctl',
@@ -68,6 +69,14 @@ async function installOctl(url: string, version: string): Promise<void> {
   core.info(`Successfully cached omnistrate-ctl to ${cachedPath}`)
   core.addPath(cachedPath)
   core.info('Added omnistrate-ctl to the path')
+  const cachedPathAlias = await toolCache.cacheDir(
+    downloadedPath,
+    'omctl',
+    version
+  )
+  core.info(`Successfully cached omctl to ${cachedPathAlias}`)
+  core.addPath(cachedPath)
+  core.info('Added omctl to the path')
 }
 
 async function login(email: string, password: string): Promise<void> {

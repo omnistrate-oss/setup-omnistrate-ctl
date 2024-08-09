@@ -28911,6 +28911,7 @@ async function install() {
         const email = core.getInput('email');
         const password = core.getInput('password');
         if (email && password) {
+            //core.setSecret(password)
             login(email, password);
         }
     }
@@ -28940,6 +28941,10 @@ async function installOctl(url, version) {
     core.info(`Successfully cached omnistrate-ctl to ${cachedPath}`);
     core.addPath(cachedPath);
     core.info('Added omnistrate-ctl to the path');
+    const cachedPathAlias = await toolCache.cacheDir(downloadedPath, 'omctl', version);
+    core.info(`Successfully cached omctl to ${cachedPathAlias}`);
+    core.addPath(cachedPath);
+    core.info('Added omctl to the path');
 }
 async function login(email, password) {
     try {
