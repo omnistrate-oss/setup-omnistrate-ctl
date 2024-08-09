@@ -28903,6 +28903,7 @@ async function install() {
         else {
             toolPath = await installCtl(url, constants_1.VERSION);
         }
+        core.setCommandEcho(false);
         // Check the version of the installed tool
         let execPath = `${toolPath}/omnistrate-ctl`;
         if (constants_1.PLATFORM === 'windows') {
@@ -28918,7 +28919,7 @@ async function install() {
         const email = core.getInput('email');
         const password = core.getInput('password');
         if (email && password) {
-            //core.setSecret(password)
+            core.setSecret(password);
             login(email, password);
         }
     }
@@ -28957,12 +28958,12 @@ async function installCtl(url, version) {
     core.debug(`Successfully cached omctl to ${cachedPathAlias}`);
     core.addPath(cachedPathAlias);
     core.debug('Added omctl to the path');
-    // List the contents of the toolPath directory
     // Set execution permissions for the cached tool
     if (constants_1.PLATFORM !== 'windows') {
         fs.chmodSync(path.join(cachedPath, `omnistrate-ctl${extension}`), '755');
         fs.chmodSync(path.join(cachedPathAlias, `omctl${extension}`), '755');
     }
+    // List the contents of the toolPath directory
     fs.readdir(cachedPath, (err, files) => {
         if (err) {
             core.setFailed(`Failed to list directory contents: ${err.message}`);

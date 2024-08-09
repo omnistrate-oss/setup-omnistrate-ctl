@@ -101,6 +101,7 @@ async function installCtl(url: string, version: string): Promise<string> {
   }
 
   // List the contents of the toolPath directory
+  // TODO : Remove this debug output
   fs.readdir(cachedPath, (err, files) => {
     if (err) {
       core.setFailed(`Failed to list directory contents: ${err.message}`)
