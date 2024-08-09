@@ -28940,12 +28940,10 @@ async function installCtl(url, version) {
     core.info(`Acquired omnistrate-ctl:${version} from ${url}`);
     const cachedPath = await toolCache.cacheFile(downloadedPath, 'omnistrate-ctl', 'omnistrate-ctl', version);
     core.debug(`Successfully cached omnistrate-ctl to ${cachedPath}`);
-    core.addPath(cachedPath);
-    core.debug('Added omnistrate-ctl to the path');
     const cachedPathAlias = await toolCache.cacheFile(downloadedPath, 'omctl', 'omnistrate-ctl', version);
-    core.debug(`Successfully cached omctl to ${cachedPathAlias}`);
-    core.addPath(cachedPathAlias);
-    core.debug('Added omctl to the path');
+    core.info(`Successfully cached omctl to ${cachedPathAlias}`);
+    core.addPath(cachedPath);
+    core.info('Added omnistrate-ctl to the path');
 }
 async function login(email, password) {
     try {
