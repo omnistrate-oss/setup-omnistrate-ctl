@@ -29001,6 +29001,7 @@ async function login(email, password) {
 }
 async function logout() {
     try {
+        // check if the tool is installed
         const cachedPath = toolCache.find('omnistrate-ctl', constants_1.VERSION);
         let exists = false;
         fs.readdir(cachedPath, (err, files) => {
@@ -29012,6 +29013,7 @@ async function logout() {
             }
         });
         if (exists) {
+            // logout of the Omnistrate CLI
             core.setCommandEcho(false);
             const exitCode = await exec.exec('omnistrate-ctl logout');
             if (exitCode !== 0) {
