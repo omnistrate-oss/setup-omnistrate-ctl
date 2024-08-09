@@ -57,13 +57,13 @@ jobs:
         id: test-action
         uses: ./
 
-      - name: Test Local Action
+      - name: Test Local Action with Version
         id: test-action-with-latest
         uses: ./
         with: 
           version: latest
 
-      - name: Test Local Action
+      - name: Test Local Action with Email and Password
         id: test-action-with-email-and-password
         uses: ./
         with: 
