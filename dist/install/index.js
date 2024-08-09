@@ -28884,6 +28884,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const toolCache = __importStar(__nccwpck_require__(7784));
 const constants_1 = __nccwpck_require__(9042);
+const fs = __importStar(__nccwpck_require__(7147));
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
@@ -28952,6 +28953,17 @@ async function installCtl(url, version) {
     core.debug(`Successfully cached omctl to ${cachedPathAlias}`);
     core.addPath(cachedPath);
     core.debug('Added omnistrate-ctl to the path');
+    // List the contents of the toolPath directory
+    fs.readdir(cachedPath, (err, files) => {
+        if (err) {
+            core.setFailed(`Failed to list directory contents: ${err.message}`);
+            return;
+        }
+        core.info(`Contents of ${cachedPath}:`);
+        for (const file of files) {
+            core.info(file);
+        }
+    });
     return cachedPath;
 }
 async function login(email, password) {

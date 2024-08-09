@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as toolCache from '@actions/tool-cache'
 import { ARCHITECTURE, PLATFORM, VERSION } from './constants'
+import * as fs from 'fs'
 
 /**
  * The main function for the action.
@@ -86,6 +87,19 @@ async function installCtl(url: string, version: string): Promise<string> {
   core.debug(`Successfully cached omctl to ${cachedPathAlias}`)
   core.addPath(cachedPath)
   core.debug('Added omnistrate-ctl to the path')
+
+  // List the contents of the toolPath directory
+  fs.readdir(cachedPath, (err, files) => {
+    if (err) {
+      core.setFailed(`Failed to list directory contents: ${err.message}`)
+      return
+    }
+    core.info(`Contents of ${cachedPath}:`)
+    for (const file of files) {
+      core.info(file)
+    }
+  })
+
   return cachedPath
 }
 
