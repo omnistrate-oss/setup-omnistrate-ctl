@@ -38,7 +38,7 @@ export async function install(): Promise<void> {
     const email = core.getInput('email')
     const password = core.getInput('password')
     if (email && password) {
-      //core.setSecret(password)
+      core.setSecret(password)
       login(email, password)
     }
   } catch (error) {
