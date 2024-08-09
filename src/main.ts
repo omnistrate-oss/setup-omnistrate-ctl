@@ -11,6 +11,7 @@ export async function install(): Promise<void> {
   try {
     // Resolve the url for the requested version
     const url = resolveUrl(PLATFORM, ARCHITECTURE, VERSION)
+    core.info(`Resolved url: ${url}`)
     // Install the resolved version if necessary
     const toolPath = toolCache.find('omnistrate-ctl', VERSION, ARCHITECTURE)
     if (toolPath) {

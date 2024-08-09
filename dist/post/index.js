@@ -28892,6 +28892,7 @@ async function install() {
     try {
         // Resolve the url for the requested version
         const url = resolveUrl(constants_1.PLATFORM, constants_1.ARCHITECTURE, constants_1.VERSION);
+        core.info(`Resolved url: ${url}`);
         // Install the resolved version if necessary
         const toolPath = toolCache.find('omnistrate-ctl', constants_1.VERSION, constants_1.ARCHITECTURE);
         if (toolPath) {
@@ -28901,7 +28902,11 @@ async function install() {
             await installOctl(url, constants_1.VERSION);
         }
         // Check the version of the installed tool
-        await exec.exec('omnistrate-ctl --version');
+        const exitCode = await exec.exec('omnistrate-ctl --version');
+        if (exitCode !== 0) {
+            core.setFailed('Failed to check the version of the installed');
+            return;
+        }
         // Login to the Omnistrate CLI with the provided credentials
         const email = core.getInput('email');
         const password = core.getInput('password');
@@ -28935,12 +28940,16 @@ async function installOctl(url, version) {
 }
 async function login(email, password) {
     try {
-        await exec.exec('omnistrate-ctl login', [
+        const exitCode = await exec.exec('omnistrate-ctl login', [
             '--email',
             email,
             '--password',
             password
         ]);
+        if (exitCode !== 0) {
+            core.setFailed('Failed to login to Omnistrate CLI');
+            return;
+        }
     }
     catch (error) {
         if (error instanceof Error) {
@@ -28953,7 +28962,11 @@ async function login(email, password) {
 }
 async function logout() {
     try {
-        await exec.exec('omnistrate-ctl logout');
+        const exitCode = await exec.exec('omnistrate-ctl logout');
+        if (exitCode !== 0) {
+            core.setFailed('Failed to logout of Omnistrate CLI');
+            return;
+        }
         console.log('Logged out of Omnistrate CLI');
     }
     catch (error) {
