@@ -22,6 +22,8 @@ export async function install(): Promise<void> {
       toolPath = await installCtl(url, VERSION)
     }
 
+    core.setCommandEcho(false)
+
     // Check the version of the installed tool
     let execPath = `${toolPath}/omnistrate-ctl`
     if (PLATFORM === 'windows') {
