@@ -60,12 +60,12 @@ jobs:
       - name: Test Local Action with Version
         id: test-action-with-latest
         uses: ./
-        with: 
+        with:
           version: latest
 
       - name: Test Local Action with Email and Password
         id: test-action-with-email-and-password
         uses: ./
-        with: 
+        with:
           email: 'test'
           password: 'test'
