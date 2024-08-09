@@ -28896,9 +28896,15 @@ async function install() {
         const url = resolveUrl(constants_1.PLATFORM, constants_1.ARCHITECTURE, constants_1.VERSION);
         core.debug(`Resolved url: ${url}`);
         // Install the resolved version if necessary
+        let useCache = false;
         let toolPath = toolCache.find('omnistrate-ctl', constants_1.VERSION);
-        if (toolPath) {
+        const toolPath2 = toolCache.find('omctl', constants_1.VERSION);
+        if (constants_1.VERSION !== 'latest' && toolPath && toolPath2) {
+            useCache = true;
+        }
+        if (useCache) {
             core.addPath(toolPath);
+            core.addPath(toolPath2);
         }
         else {
             toolPath = await installCtl(url, constants_1.VERSION);
@@ -28960,18 +28966,6 @@ async function installCtl(url, version) {
         fs.chmodSync(path.join(cachedPath, `omnistrate-ctl${extension}`), '755');
         fs.chmodSync(path.join(cachedPathAlias, `omctl${extension}`), '755');
     }
-    // List the contents of the toolPath directory
-    // TODO : Remove this debug output
-    fs.readdir(cachedPath, (err, files) => {
-        if (err) {
-            core.setFailed(`Failed to list directory contents: ${err.message}`);
-            return;
-        }
-        core.info(`Contents of ${cachedPath}:`);
-        for (const file of files) {
-            core.info(file);
-        }
-    });
     return cachedPath;
 }
 async function login(email, password) {
