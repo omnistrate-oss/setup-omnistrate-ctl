@@ -5,12 +5,12 @@
 import * as main from '../src/main'
 
 // Mock the action's entrypoint
-const runMock = jest.spyOn(main, 'run').mockImplementation()
+const runMock = jest.spyOn(main, 'install').mockImplementation()
 
-describe('index', () => {
+describe('install', () => {
   it('calls run when imported', async () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('../src/index')
+    require('../src/install')
 
     expect(runMock).toHaveBeenCalled()
   })
