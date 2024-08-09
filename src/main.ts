@@ -139,9 +139,20 @@ async function login(email: string, password: string): Promise<void> {
 
 export async function logout(): Promise<void> {
   try {
-    const toolPath = toolCache.find('omnistrate-ctl', VERSION)
-    if (toolPath) {
-      core.setCommandEcho(true)
+    // check if the tool is installed
+    const cachedPath = toolCache.find('omnistrate-ctl', VERSION)
+    let exists = false
+    fs.readdir(cachedPath, (err, files) => {
+      for (const file of files) {
+        if (file === 'omnistrate-ctl') {
+          exists = true
+        }
+        break
+      }
+    })
+    if (exists) {
+      // logout of the Omnistrate CLI
+      core.setCommandEcho(false)
       const exitCode = await exec.exec('omnistrate-ctl logout')
       if (exitCode !== 0) {
         core.setFailed('Failed to logout of Omnistrate CLI')

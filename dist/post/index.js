@@ -28964,6 +28964,7 @@ async function installCtl(url, version) {
         fs.chmodSync(path.join(cachedPathAlias, `omctl${extension}`), '755');
     }
     // List the contents of the toolPath directory
+    // TODO : Remove this debug output
     fs.readdir(cachedPath, (err, files) => {
         if (err) {
             core.setFailed(`Failed to list directory contents: ${err.message}`);
@@ -29000,9 +29001,18 @@ async function login(email, password) {
 }
 async function logout() {
     try {
-        const toolPath = toolCache.find('omnistrate-ctl', constants_1.VERSION);
-        if (toolPath) {
-            core.setCommandEcho(true);
+        const cachedPath = toolCache.find('omnistrate-ctl', constants_1.VERSION);
+        let exists = false;
+        fs.readdir(cachedPath, (err, files) => {
+            for (const file of files) {
+                if (file === 'omnistrate-ctl') {
+                    exists = true;
+                }
+                break;
+            }
+        });
+        if (exists) {
+            core.setCommandEcho(false);
             const exitCode = await exec.exec('omnistrate-ctl logout');
             if (exitCode !== 0) {
                 core.setFailed('Failed to logout of Omnistrate CLI');
