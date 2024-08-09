@@ -112,15 +112,23 @@ async function installCtl(url: string, version: string): Promise<string> {
 }
 
 async function login(email: string, password: string): Promise<void> {
-  const exitCode = await exec.exec('omnistrate-ctl login', [
-    '--email',
-    email,
-    '--password',
-    password
-  ])
-  if (exitCode !== 0) {
-    core.setFailed('Failed to login to Omnistrate CLI')
-    return
+  try {
+    const exitCode = await exec.exec('omnistrate-ctl login', [
+      '--email',
+      email,
+      '--password',
+      password
+    ])
+    if (exitCode !== 0) {
+      core.setFailed('Failed to login to Omnistrate CLI')
+      return
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    } else {
+      core.setFailed(`${error}`)
+    }
   }
 }
 
@@ -128,10 +136,6 @@ export async function logout(): Promise<void> {
   try {
     // check if the tool is installed
     const cachedPath = toolCache.find('omnistrate-ctl', VERSION)
-    if (!cachedPath) {
-      console.log('Omnistrate CLI is not installed')
-      return
-    }
     let exists = false
     fs.readdir(cachedPath, (err, files) => {
       for (const file of files) {
