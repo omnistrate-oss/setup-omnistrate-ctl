@@ -28992,29 +28992,13 @@ async function login(email, password) {
 }
 async function logout() {
     try {
-        // check if the tool is installed
-        const cachedPath = toolCache.find('omnistrate-ctl', constants_1.VERSION);
-        let exists = false;
-        fs.readdir(cachedPath, (err, files) => {
-            for (const file of files) {
-                if (file === 'omnistrate-ctl') {
-                    exists = true;
-                    break;
-                }
-            }
-        });
-        if (exists) {
-            // logout of the Omnistrate CLI
-            const exitCode = await exec.exec('omnistrate-ctl logout');
-            if (exitCode !== 0) {
-                console.warn('Failed to logout of Omnistrate CLI');
-                return;
-            }
-            console.info('Logged out of Omnistrate CLI');
+        // logout of the Omnistrate CLI
+        const exitCode = await exec.exec('omnistrate-ctl logout');
+        if (exitCode !== 0) {
+            console.warn('Failed to logout of Omnistrate CLI');
+            return;
         }
-        else {
-            console.info('Omnistrate CLI is not installed');
-        }
+        console.info('Logged out of Omnistrate CLI');
     }
     catch (error) {
         console.warn('Failed to logout of Omnistrate CLI - ', error);
