@@ -57,6 +57,10 @@ jobs:
         id: test-action
         uses: ./
 
+      - name: Print Output
+        id: output
+        run: echo "${{ steps.test-action.outputs.version }}"
+
       - name: Test Local Action with Version
         id: test-action-with-latest
         uses: ./

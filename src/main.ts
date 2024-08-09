@@ -20,7 +20,11 @@ export async function install(): Promise<void> {
     }
 
     // Check the version of the installed tool
-    await exec.exec('omnistrate-ctl --version')
+    const exitCode = await exec.exec('omnistrate-ctl --version')
+    if (exitCode !== 0) {
+      core.setFailed('Failed to check the version of the installed')
+      return
+    }
 
     // Login to the Omnistrate CLI with the provided credentials
     const email = core.getInput('email')
@@ -65,12 +69,16 @@ async function installOctl(url: string, version: string): Promise<void> {
 
 async function login(email: string, password: string): Promise<void> {
   try {
-    await exec.exec('omnistrate-ctl login', [
+    const exitCode = await exec.exec('omnistrate-ctl login', [
       '--email',
       email,
       '--password',
       password
     ])
+    if (exitCode !== 0) {
+      core.setFailed('Failed to login to Omnistrate CLI')
+      return
+    }
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
@@ -82,7 +90,11 @@ async function login(email: string, password: string): Promise<void> {
 
 export async function logout(): Promise<void> {
   try {
-    await exec.exec('omnistrate-ctl logout')
+    const exitCode = await exec.exec('omnistrate-ctl logout')
+    if (exitCode !== 0) {
+      core.setFailed('Failed to logout of Omnistrate CLI')
+      return
+    }
     console.log('Logged out of Omnistrate CLI')
   } catch (error) {
     console.log('Failed to logout of Omnistrate CLI - ', error)

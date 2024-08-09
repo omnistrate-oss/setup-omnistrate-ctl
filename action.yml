@@ -20,6 +20,7 @@ inputs:
   version:
     description: 'Omnistrate CTL version'
     required: false
+    default: 'latest'
 
 runs:
   using: node20
