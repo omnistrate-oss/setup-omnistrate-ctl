@@ -18,7 +18,9 @@ inputs:
     description: 'User password'
     required: false
   version:
-    description: 'Omnistrate CTL version'
+    description: |-
+      Version of Omnistrate CTL to install. If unspecified or set to "latest",
+      the latest version for the target platform will be installed. 
     required: false
     default: 'latest'
 
