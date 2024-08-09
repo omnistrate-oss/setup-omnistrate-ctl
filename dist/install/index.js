@@ -28885,6 +28885,7 @@ const exec = __importStar(__nccwpck_require__(1514));
 const toolCache = __importStar(__nccwpck_require__(7784));
 const constants_1 = __nccwpck_require__(9042);
 const fs = __importStar(__nccwpck_require__(7147));
+const path = __importStar(__nccwpck_require__(1017));
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
@@ -28942,6 +28943,7 @@ function resolveUrl(platform, architecture, version) {
 }
 async function installCtl(url, version) {
     const downloadedPath = await toolCache.downloadTool(url);
+    core.setCommandEcho;
     core.info(`Acquired omnistrate-ctl:${version} from ${url}`);
     let extension = '';
     if (constants_1.PLATFORM === 'windows') {
@@ -28956,6 +28958,11 @@ async function installCtl(url, version) {
     core.addPath(cachedPathAlias);
     core.debug('Added omctl to the path');
     // List the contents of the toolPath directory
+    // Set execution permissions for the cached tool
+    if (constants_1.PLATFORM !== 'windows') {
+        fs.chmodSync(path.join(cachedPath, `omnistrate-ctl${extension}`), '755');
+        fs.chmodSync(path.join(cachedPathAlias, `omctl${extension}`), '755');
+    }
     fs.readdir(cachedPath, (err, files) => {
         if (err) {
             core.setFailed(`Failed to list directory contents: ${err.message}`);
@@ -28992,8 +28999,9 @@ async function login(email, password) {
 }
 async function logout() {
     try {
-        const toolPath = toolCache.find('omnistrate-ctl', constants_1.VERSION, constants_1.ARCHITECTURE);
+        const toolPath = toolCache.find('omnistrate-ctl', constants_1.VERSION);
         if (toolPath) {
+            core.setCommandEcho(true);
             const exitCode = await exec.exec('omnistrate-ctl logout');
             if (exitCode !== 0) {
                 core.setFailed('Failed to logout of Omnistrate CLI');

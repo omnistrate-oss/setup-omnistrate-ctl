@@ -3,6 +3,7 @@ import * as exec from '@actions/exec'
 import * as toolCache from '@actions/tool-cache'
 import { ARCHITECTURE, PLATFORM, VERSION } from './constants'
 import * as fs from 'fs'
+import * as path from 'path'
 
 /**
  * The main function for the action.
@@ -66,6 +67,7 @@ function resolveUrl(
 
 async function installCtl(url: string, version: string): Promise<string> {
   const downloadedPath = await toolCache.downloadTool(url)
+  core.setCommandEcho
   core.info(`Acquired omnistrate-ctl:${version} from ${url}`)
   let extension = ''
   if (PLATFORM === 'windows') {
@@ -89,6 +91,12 @@ async function installCtl(url: string, version: string): Promise<string> {
   core.debug(`Successfully cached omctl to ${cachedPathAlias}`)
   core.addPath(cachedPathAlias)
   core.debug('Added omctl to the path')
+
+  // Set execution permissions for the cached tool
+  if (PLATFORM !== 'windows') {
+    fs.chmodSync(path.join(cachedPath, `omnistrate-ctl${extension}`), '755')
+    fs.chmodSync(path.join(cachedPathAlias, `omctl${extension}`), '755')
+  }
 
   // List the contents of the toolPath directory
   fs.readdir(cachedPath, (err, files) => {
@@ -128,8 +136,9 @@ async function login(email: string, password: string): Promise<void> {
 
 export async function logout(): Promise<void> {
   try {
-    const toolPath = toolCache.find('omnistrate-ctl', VERSION, ARCHITECTURE)
+    const toolPath = toolCache.find('omnistrate-ctl', VERSION)
     if (toolPath) {
+      core.setCommandEcho(true)
       const exitCode = await exec.exec('omnistrate-ctl logout')
       if (exitCode !== 0) {
         core.setFailed('Failed to logout of Omnistrate CLI')
