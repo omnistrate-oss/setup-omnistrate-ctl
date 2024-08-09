@@ -68,18 +68,16 @@ async function installCtl(url: string, version: string): Promise<void> {
     'omnistrate-ctl',
     version
   )
-  core.info(`Successfully cached omnistrate-ctl to ${cachedPath}`)
-  core.addPath(cachedPath)
-  core.info('Added omnistrate-ctl to the path')
+  core.debug(`Successfully cached omnistrate-ctl to ${cachedPath}`)
   const cachedPathAlias = await toolCache.cacheFile(
     downloadedPath,
     'omctl',
-    'omctl',
+    'omnistrate-ctl',
     version
   )
   core.info(`Successfully cached omctl to ${cachedPathAlias}`)
-  core.addPath(cachedPathAlias)
-  core.info('Added omctl to the path')
+  core.addPath(cachedPath)
+  core.info('Added omnistrate-ctl to the path')
 }
 
 async function login(email: string, password: string): Promise<void> {
@@ -91,14 +89,14 @@ async function login(email: string, password: string): Promise<void> {
       password
     ])
     if (exitCode !== 0) {
-      core.setFailed('Failed to login to Omnistrate CLI')
+      core.warning('Failed to login to Omnistrate CLI')
       return
     }
   } catch (error) {
     if (error instanceof Error) {
-      core.setFailed(error.message)
+      core.warning(error.message)
     } else {
-      core.setFailed(`${error}`)
+      core.warning(`${error}`)
     }
   }
 }

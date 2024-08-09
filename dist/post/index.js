@@ -28939,13 +28939,13 @@ async function installCtl(url, version) {
     const downloadedPath = await toolCache.downloadTool(url);
     core.info(`Acquired omnistrate-ctl:${version} from ${url}`);
     const cachedPath = await toolCache.cacheFile(downloadedPath, 'omnistrate-ctl', 'omnistrate-ctl', version);
-    core.info(`Successfully cached omnistrate-ctl to ${cachedPath}`);
+    core.debug(`Successfully cached omnistrate-ctl to ${cachedPath}`);
     core.addPath(cachedPath);
-    core.info('Added omnistrate-ctl to the path');
-    const cachedPathAlias = await toolCache.cacheFile(downloadedPath, 'omctl', 'omctl', version);
-    core.info(`Successfully cached omctl to ${cachedPathAlias}`);
-    core.addPath(cachedPath);
-    core.info('Added omctl to the path');
+    core.debug('Added omnistrate-ctl to the path');
+    const cachedPathAlias = await toolCache.cacheFile(downloadedPath, 'omctl', 'omnistrate-ctl', version);
+    core.debug(`Successfully cached omctl to ${cachedPathAlias}`);
+    core.addPath(cachedPathAlias);
+    core.debug('Added omctl to the path');
 }
 async function login(email, password) {
     try {
@@ -28956,16 +28956,16 @@ async function login(email, password) {
             password
         ]);
         if (exitCode !== 0) {
-            core.setFailed('Failed to login to Omnistrate CLI');
+            core.warning('Failed to login to Omnistrate CLI');
             return;
         }
     }
     catch (error) {
         if (error instanceof Error) {
-            core.setFailed(error.message);
+            core.warning(error.message);
         }
         else {
-            core.setFailed(`${error}`);
+            core.warning(`${error}`);
         }
     }
 }
