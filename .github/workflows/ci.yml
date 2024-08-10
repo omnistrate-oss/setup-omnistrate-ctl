@@ -117,4 +117,7 @@ jobs:
         run: |
           omnistrate-ctl --version
           omctl --help
+
+      - name: List Local Action CTL
+        run:
           omctl list
