@@ -117,3 +117,4 @@ jobs:
         run: |
           omnistrate-ctl --version
           omctl --help
+          omctl list
