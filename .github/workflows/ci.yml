@@ -85,7 +85,7 @@ jobs:
         id: test-action-with-latest
         uses: ./
         with:
-          version: latest
+          version: v0.9.34
 
       - name: Test Local Action CTL
         run: |
@@ -110,8 +110,8 @@ jobs:
         id: test-action-with-email-and-password
         uses: ./
         with:
-          email: 'test'
-          password: 'test'
+          email: ${{ secrets.OMNISTRATE_ACCOUNT_EMAIL }}
+          password: '${{ secrets.OMNISTRATE_ACCOUNT_PASSWORD }}'
 
       - name: Test Local Action CTL
         run: |
