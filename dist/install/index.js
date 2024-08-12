@@ -28812,10 +28812,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PLATFORM = exports.ARCHITECTURE = exports.VERSION = void 0;
+exports.getVersion = getVersion;
+exports.getArchitecture = getArchitecture;
+exports.getPlatform = getPlatform;
 const core = __importStar(__nccwpck_require__(2186));
-exports.VERSION = core.getInput('version');
-exports.ARCHITECTURE = (() => {
-    const arch = process.arch;
+exports.VERSION = getVersion();
+function getVersion() {
+    return core.getInput('version');
+}
+exports.ARCHITECTURE = getArchitecture(process.arch);
+function getArchitecture(arch) {
     switch (arch) {
         case 'arm64': {
             return 'arm64';
@@ -28827,9 +28833,9 @@ exports.ARCHITECTURE = (() => {
             throw new Error(arch);
         }
     }
-})();
-exports.PLATFORM = (() => {
-    const platform = process.platform;
+}
+exports.PLATFORM = getPlatform(process.platform);
+function getPlatform(platform) {
     switch (platform) {
         case 'darwin': {
             return 'darwin';
@@ -28844,7 +28850,7 @@ exports.PLATFORM = (() => {
             throw new Error(platform);
         }
     }
-})();
+}
 
 
 /***/ }),
