@@ -46,7 +46,12 @@ jobs:
 
   test-action:
     name: GitHub Actions Test
-    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
@@ -56,9 +61,62 @@ jobs:
       - name: Test Local Action
         id: test-action
         uses: ./
-        with:
-          milliseconds: 2000
 
-      - name: Print Output
-        id: output
-        run: echo "${{ steps.test-action.outputs.time }}"
+      - name: Test Local Action CTL
+        run: |
+          omnistrate-ctl --version
+          omctl --help
+
+  test-action-with-version:
+    name: GitHub Actions Test with Version
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Test Local Action with Version
+        id: test-action-with-latest
+        uses: ./
+        with:
+          version: v0.9.34
+
+      - name: Test Local Action CTL
+        run: |
+          omnistrate-ctl --version
+          omctl --help
+
+  test-action-with-email-and-password:
+    name: GitHub Actions Test with Email and Password
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Test Local Action with Email and Password
+        id: test-action-with-email-and-password
+        uses: ./
+        with:
+          email: ${{ secrets.OMNISTRATE_ACCOUNT_EMAIL }}
+          password: '${{ secrets.OMNISTRATE_ACCOUNT_PASSWORD }}'
+
+      - name: Test Local Action CTL
+        run: |
+          omnistrate-ctl --version
+          omctl --help
+
+      - name: List Local Action CTL
+        run: omctl list

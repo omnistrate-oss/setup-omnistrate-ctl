@@ -1,24 +1,30 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Setup Omnistrate CTL'
+description:
+  'Wraps the Omnistrate CTL command line to deploy and operate Omnistrate
+  services'
+author: 'Omnistrate'
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: 'heart'
-  color: 'red'
+  icon: 'command'
+  color: 'green'
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
-    required: true
-    default: '1000'
-
-# Define your outputs here.
-outputs:
-  time:
-    description: 'Your output description here'
+  email:
+    description: 'User email'
+    required: false
+  password:
+    description: 'User password'
+    required: false
+  version:
+    description: |-
+      Version of Omnistrate CTL to install. If unspecified or set to "latest",
+      the latest version for the target platform will be installed.
+    required: false
+    default: 'latest'
 
 runs:
   using: node20
-  main: dist/index.js
+  main: dist/install/index.js
+  post: dist/post/index.js
