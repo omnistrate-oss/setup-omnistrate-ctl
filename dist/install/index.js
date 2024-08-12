@@ -28879,6 +28879,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.install = install;
+exports.login = login;
 exports.logout = logout;
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
@@ -28995,13 +28996,13 @@ async function logout() {
         // logout of the Omnistrate CLI
         const exitCode = await exec.exec('omnistrate-ctl logout');
         if (exitCode !== 0) {
-            console.warn('Failed to logout of Omnistrate CLI');
+            console.warn('Failed to logout from Omnistrate CLI');
             return;
         }
         console.info('Logged out of Omnistrate CLI');
     }
     catch (error) {
-        console.warn('Failed to logout of Omnistrate CLI - ', error);
+        console.warn('Failed to logout from Omnistrate CLI', error);
     }
 }
 

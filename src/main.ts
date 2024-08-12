@@ -135,6 +135,6 @@ export async function logout(): Promise<void> {
     }
     console.info('Logged out of Omnistrate CLI')
   } catch (error) {
-    console.warn('Failed to logout from Omnistrate CLI - ', error)
+    console.warn('Failed to logout from Omnistrate CLI', error)
   }
 }
