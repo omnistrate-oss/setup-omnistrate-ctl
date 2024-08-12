@@ -1,21 +1,18 @@
 import * as main from '../src/main'
 import fetchMock from 'jest-fetch-mock'
 import * as exec from '@actions/exec'
-import * as core from '@actions/core'
 
 fetchMock.enableMocks()
 
 // Mock the GitHub Actions core library
-let errorMock: jest.SpyInstance
 let execMock: jest.SpyInstance
-let warnMock: jest.SpyInstance
 
 describe('logout', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    errorMock = jest.spyOn(core, 'error').mockImplementation()
-    execMock = jest.spyOn(exec, 'exec').mockImplementation(() => Promise.resolve(0))
-    warnMock = jest.spyOn(console, 'warn').mockImplementation()
+    execMock = jest
+      .spyOn(exec, 'exec')
+      .mockImplementation(() => Promise.resolve(0))
   })
 
   it('calls exec with the correct command', async () => {
@@ -30,7 +27,9 @@ describe('logout', () => {
 
     expect(execMock).toHaveBeenCalledWith('omnistrate-ctl logout')
     expect(result).toBeUndefined()
-    expect(console.warn).toHaveBeenCalledWith('Failed to logout from Omnistrate CLI')
+    expect(console.warn).toHaveBeenCalledWith(
+      'Failed to logout from Omnistrate CLI'
+    )
   })
 
   it('handles exceptions correctly', async () => {
@@ -40,6 +39,9 @@ describe('logout', () => {
     await main.logout()
 
     expect(execMock).toHaveBeenCalledWith('omnistrate-ctl logout')
-    expect(console.warn).toHaveBeenCalledWith('Failed to logout from Omnistrate CLI - ', error)
+    expect(console.warn).toHaveBeenCalledWith(
+      'Failed to logout from Omnistrate CLI - ',
+      error
+    )
   })
 })
