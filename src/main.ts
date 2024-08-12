@@ -104,7 +104,7 @@ async function installCtl(url: string, version: string): Promise<string> {
   return cachedPath
 }
 
-async function login(email: string, password: string): Promise<void> {
+export async function login(email: string, password: string): Promise<void> {
   try {
     const exitCode = await exec.exec('omnistrate-ctl login', [
       '--email',
@@ -130,11 +130,11 @@ export async function logout(): Promise<void> {
     // logout of the Omnistrate CLI
     const exitCode = await exec.exec('omnistrate-ctl logout')
     if (exitCode !== 0) {
-      console.warn('Failed to logout of Omnistrate CLI')
+      console.warn('Failed to logout from Omnistrate CLI')
       return
     }
     console.info('Logged out of Omnistrate CLI')
   } catch (error) {
-    console.warn('Failed to logout of Omnistrate CLI - ', error)
+    console.warn('Failed to logout from Omnistrate CLI - ', error)
   }
 }
