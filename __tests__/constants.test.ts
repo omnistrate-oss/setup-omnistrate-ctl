@@ -5,7 +5,6 @@ import fetchMock from 'jest-fetch-mock'
 fetchMock.enableMocks()
 
 let coreMock: jest.SpyInstance
-let processMock: jest.SpyInstance
 
 describe('getVersion', () => {
   beforeEach(() => {
