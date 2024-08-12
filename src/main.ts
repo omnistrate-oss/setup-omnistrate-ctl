@@ -53,7 +53,7 @@ export async function install(): Promise<void> {
   }
 }
 
-function resolveUrl(
+export function resolveUrl(
   platform: string,
   architecture: string,
   version: string

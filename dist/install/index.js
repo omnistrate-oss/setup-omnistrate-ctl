@@ -28885,6 +28885,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.install = install;
+exports.resolveUrl = resolveUrl;
 exports.login = login;
 exports.logout = logout;
 const core = __importStar(__nccwpck_require__(2186));
