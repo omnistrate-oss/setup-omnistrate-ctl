@@ -28908,7 +28908,7 @@ async function install() {
         const url = resolveUrl(constants_1.PLATFORM, constants_1.ARCHITECTURE, constants_1.VERSION);
         core.debug(`Resolved url: ${url}`);
         // Install the resolved version if necessary
-        let toolPath = toolCache.find('omnistrate-ctl', constants_1.VERSION);
+        const toolPath = toolCache.find('omnistrate-ctl', constants_1.VERSION);
         const toolPath2 = toolCache.find('omctl', constants_1.VERSION);
         if (constants_1.VERSION !== 'latest' && toolPath && toolPath2) {
             // use cache
@@ -28916,7 +28916,7 @@ async function install() {
             core.addPath(toolPath2);
         }
         else {
-            toolPath = await installCtl(url, constants_1.VERSION);
+            await installCtl(url, constants_1.VERSION);
         }
         // Login to the Omnistrate CLI with the provided credentials
         const email = core.getInput('email');
@@ -28964,7 +28964,6 @@ async function installCtl(url, version) {
         fs.chmodSync(path.join(cachedPath, `omnistrate-ctl`), '755');
         fs.chmodSync(path.join(cachedPathAlias, `omctl`), '755');
     }
-    return cachedPath;
 }
 async function login(email, password) {
     try {
