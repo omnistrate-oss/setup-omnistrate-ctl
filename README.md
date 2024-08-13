@@ -10,12 +10,12 @@
 
 This action allows you to easily setup Omnistrate CTL command like to be able to
 create and operate Omnistrate services. It allows to optionally set up a version
-of the Omnistrate CTL command to use or uses latest by default. It also allows to
-setup a email and password to use to login to Omnistrate, we recommend storing
-the email and passwords as secrets in GitHub and reference those secrets from
-the Action. Using this action ensures that the logout command is executed at the
-end of the workflow so the temporal token to access Omnistrate is removed from
-the host machine.
+of the Omnistrate CTL command to use or uses latest by default. It also allows
+to setup a email and password to use to login to Omnistrate, we recommend
+storing the email and passwords as secrets in GitHub and reference those secrets
+from the Action. Using this action ensures that the logout command is executed
+at the end of the workflow so the temporal token to access Omnistrate is removed
+from the host machine.
 
 ## Usage
 
