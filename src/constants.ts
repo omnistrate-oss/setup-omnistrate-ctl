@@ -1,9 +1,18 @@
 import * as core from '@actions/core'
 
-export const VERSION = core.getInput('version')
+export const VERSION = getVersion()
 
-export const ARCHITECTURE = (() => {
-  const arch = process.arch
+export function getVersion(): string {
+  const version = core.getInput('version')
+  if (version) {
+    return version
+  }
+  return 'latest'
+}
+
+export const ARCHITECTURE = getArchitecture(process.arch)
+
+export function getArchitecture(arch: string): string {
   switch (arch) {
     case 'arm64': {
       return 'arm64'
@@ -15,10 +24,11 @@ export const ARCHITECTURE = (() => {
       throw new Error(arch)
     }
   }
-})()
+}
 
-export const PLATFORM = (() => {
-  const platform = process.platform
+export const PLATFORM = getPlatform(process.platform)
+
+export function getPlatform(platform: string): string {
   switch (platform) {
     case 'darwin': {
       return 'darwin'
@@ -33,4 +43,4 @@ export const PLATFORM = (() => {
       throw new Error(platform)
     }
   }
-})()
+}
