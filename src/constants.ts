@@ -3,7 +3,11 @@ import * as core from '@actions/core'
 export const VERSION = getVersion()
 
 export function getVersion(): string {
-  return core.getInput('version')
+  const version = core.getInput('version')
+  if (version) {
+    return version
+  }
+  return 'latest'
 }
 
 export const ARCHITECTURE = getArchitecture(process.arch)

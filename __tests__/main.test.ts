@@ -1,11 +1,20 @@
 import * as main from '../src/main'
 import fetchMock from 'jest-fetch-mock'
 import * as exec from '@actions/exec'
+import * as toolCache from '@actions/tool-cache'
+import * as core from '@actions/core'
+// import * as fs from 'fs'
 
 fetchMock.enableMocks()
 
 // Mock the GitHub Actions core library
 let execMock: jest.SpyInstance
+let toolCacheFindMock: jest.SpyInstance
+//let toolCacheCacheFileMock: jest.SpyInstance
+let toolCacheDownloadToolMock: jest.SpyInstance
+let coreAddPathMock: jest.SpyInstance
+let coreSetFailed: jest.SpyInstance
+// let fsChmodSyncMock: jest.SpyInstance
 
 describe('logout', () => {
   beforeEach(() => {
@@ -110,5 +119,55 @@ describe('resolveUrl', () => {
     const version = 'latest'
     const url = `https://github.com/omnistrate/cli/releases/latest/download/omnistrate-ctl-${platform}-${architecture}.exe`
     expect(main.resolveUrl(platform, architecture, version)).toBe(url)
+  })
+})
+
+describe('install', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    execMock = jest.spyOn(exec, 'exec')
+    toolCacheFindMock = jest.spyOn(toolCache, 'find')
+    toolCacheDownloadToolMock = jest.spyOn(toolCache, 'downloadTool')
+    //toolCacheCacheFileMock = jest.spyOn(toolCache, 'cacheFile')
+    coreAddPathMock = jest.spyOn(core, 'addPath')
+    coreSetFailed = jest.spyOn(core, 'setFailed')
+    //fsChmodSyncMock = jest.spyOn(fs, 'chmodSync')
+  })
+
+  it('should install the tool', async () => {
+    const version = 'latest'
+    const downloadPath = '/path/downloaded'
+    //const pathCached = '/path/cached'
+
+    toolCacheFindMock.mockImplementation(() => '')
+    toolCacheDownloadToolMock.mockImplementation(async () =>
+      Promise.resolve(downloadPath)
+    )
+    // toolCacheCacheFileMock.mockImplementation(async () =>
+    //   Promise.resolve(pathCached)
+    // )
+
+    main.install()
+
+    expect(toolCacheFindMock).toHaveBeenCalledWith('omnistrate-ctl', version)
+    expect(toolCacheFindMock).toHaveBeenCalledWith('omctl', version)
+    expect(coreAddPathMock).not.toHaveBeenCalledWith('')
+    expect(toolCacheDownloadToolMock).toHaveBeenCalledTimes(1)
+    //expect(toolCacheCacheFileMock).toHaveBeenCalledTimes(1)
+    expect(coreSetFailed).not.toHaveBeenCalled()
+    // expect(toolCacheCacheFileMock).toHaveBeenCalledWith(
+    //   downloadPath,
+    //   'omnistrate-ctl',
+    //   'omnistrate-ctl',
+    //   version
+    // )
+    // expect(coreAddPathMock).toHaveBeenCalledWith(pathCached)
+    // expect(toolCacheCacheFileMock).toHaveBeenCalledWith(
+    //   downloadPath,
+    //   'omctl',
+    //   'omctl',
+    //   version
+    // )
+    // expect(coreAddPathMock).toHaveBeenCalledWith(pathCached)
   })
 })

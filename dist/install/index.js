@@ -28818,7 +28818,11 @@ exports.getPlatform = getPlatform;
 const core = __importStar(__nccwpck_require__(2186));
 exports.VERSION = getVersion();
 function getVersion() {
-    return core.getInput('version');
+    const version = core.getInput('version');
+    if (version) {
+        return version;
+    }
+    return 'latest';
 }
 exports.ARCHITECTURE = getArchitecture(process.arch);
 function getArchitecture(arch) {
@@ -28904,28 +28908,15 @@ async function install() {
         const url = resolveUrl(constants_1.PLATFORM, constants_1.ARCHITECTURE, constants_1.VERSION);
         core.debug(`Resolved url: ${url}`);
         // Install the resolved version if necessary
-        let useCache = false;
         let toolPath = toolCache.find('omnistrate-ctl', constants_1.VERSION);
         const toolPath2 = toolCache.find('omctl', constants_1.VERSION);
         if (constants_1.VERSION !== 'latest' && toolPath && toolPath2) {
-            useCache = true;
-        }
-        if (useCache) {
+            // use cache
             core.addPath(toolPath);
             core.addPath(toolPath2);
         }
         else {
             toolPath = await installCtl(url, constants_1.VERSION);
-        }
-        // Check the version of the installed tool
-        let execPath = `${toolPath}/omnistrate-ctl`;
-        if (constants_1.PLATFORM === 'windows') {
-            execPath += '.exe';
-        }
-        const exitCode = await exec.exec(execPath, ['--version']);
-        if (exitCode !== 0) {
-            core.setFailed('Failed to check the version of the installed');
-            return;
         }
         // Login to the Omnistrate CLI with the provided credentials
         const email = core.getInput('email');
@@ -28955,8 +28946,7 @@ function resolveUrl(platform, architecture, version) {
 }
 async function installCtl(url, version) {
     const downloadedPath = await toolCache.downloadTool(url);
-    core.setCommandEcho;
-    core.info(`Acquired omnistrate-ctl:${version} from ${url}`);
+    core.info(`Requested omnistrate-ctl:${version} from ${url}`);
     let extension = '';
     if (constants_1.PLATFORM === 'windows') {
         extension = '.exe';
@@ -28971,8 +28961,8 @@ async function installCtl(url, version) {
     core.debug('Added omctl to the path');
     // Set execution permissions for the cached tool
     if (constants_1.PLATFORM !== 'windows') {
-        fs.chmodSync(path.join(cachedPath, `omnistrate-ctl${extension}`), '755');
-        fs.chmodSync(path.join(cachedPathAlias, `omctl${extension}`), '755');
+        fs.chmodSync(path.join(cachedPath, `omnistrate-ctl`), '755');
+        fs.chmodSync(path.join(cachedPathAlias, `omctl`), '755');
     }
     return cachedPath;
 }
