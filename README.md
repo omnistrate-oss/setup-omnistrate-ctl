@@ -34,6 +34,6 @@ from the host machine.
   run: |
     # rum simple command as an example
     omnistrate-ctl --version
-    # octl alias is also supported
-    octl --version
+    # omctl alias is also supported
+    omctl --version
 ```
