@@ -128,24 +128,18 @@ describe('install', () => {
     execMock = jest.spyOn(exec, 'exec')
     toolCacheFindMock = jest.spyOn(toolCache, 'find')
     toolCacheDownloadToolMock = jest.spyOn(toolCache, 'downloadTool')
-    //toolCacheCacheFileMock = jest.spyOn(toolCache, 'cacheFile')
     coreAddPathMock = jest.spyOn(core, 'addPath')
     coreSetFailed = jest.spyOn(core, 'setFailed')
-    //fsChmodSyncMock = jest.spyOn(fs, 'chmodSync')
   })
 
   it('should install the tool', async () => {
     const version = 'latest'
     const downloadPath = '/path/downloaded'
-    //const pathCached = '/path/cached'
 
     toolCacheFindMock.mockImplementation(() => '')
     toolCacheDownloadToolMock.mockImplementation(async () =>
       Promise.resolve(downloadPath)
     )
-    // toolCacheCacheFileMock.mockImplementation(async () =>
-    //   Promise.resolve(pathCached)
-    // )
 
     main.install()
 
@@ -153,21 +147,6 @@ describe('install', () => {
     expect(toolCacheFindMock).toHaveBeenCalledWith('omctl', version)
     expect(coreAddPathMock).not.toHaveBeenCalledWith('')
     expect(toolCacheDownloadToolMock).toHaveBeenCalledTimes(1)
-    //expect(toolCacheCacheFileMock).toHaveBeenCalledTimes(1)
     expect(coreSetFailed).not.toHaveBeenCalled()
-    // expect(toolCacheCacheFileMock).toHaveBeenCalledWith(
-    //   downloadPath,
-    //   'omnistrate-ctl',
-    //   'omnistrate-ctl',
-    //   version
-    // )
-    // expect(coreAddPathMock).toHaveBeenCalledWith(pathCached)
-    // expect(toolCacheCacheFileMock).toHaveBeenCalledWith(
-    //   downloadPath,
-    //   'omctl',
-    //   'omctl',
-    //   version
-    // )
-    // expect(coreAddPathMock).toHaveBeenCalledWith(pathCached)
   })
 })

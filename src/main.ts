@@ -22,7 +22,7 @@ export async function install(): Promise<void> {
       core.addPath(toolPath)
       core.addPath(toolPath2)
     } else {
-      toolPath = await installCtl(url, VERSION)
+      await installCtl(url, VERSION)
     }
 
     // Login to the Omnistrate CLI with the provided credentials
@@ -55,7 +55,7 @@ export function resolveUrl(
   return url
 }
 
-async function installCtl(url: string, version: string): Promise<string> {
+async function installCtl(url: string, version: string): Promise<void> {
   const downloadedPath = await toolCache.downloadTool(url)
   core.info(`Requested omnistrate-ctl:${version} from ${url}`)
   let extension = ''
@@ -86,8 +86,6 @@ async function installCtl(url: string, version: string): Promise<string> {
     fs.chmodSync(path.join(cachedPath, `omnistrate-ctl`), '755')
     fs.chmodSync(path.join(cachedPathAlias, `omctl`), '755')
   }
-
-  return cachedPath
 }
 
 export async function login(email: string, password: string): Promise<void> {
