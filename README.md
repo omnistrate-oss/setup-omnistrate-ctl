@@ -21,7 +21,8 @@ the host machine.
 
 - [Usage](#usage)
 
-* [Customizing](#customizing)
+- [Customizing](#customizing)
+
   - [inputs](#inputs)
 
 - [Contributing](#contributing)
