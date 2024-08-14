@@ -17,7 +17,8 @@ the host machine.
 
 ---
 
-- [Usage](#usage)
+* [Usage](#usage)
+* [Contributing](#contributing)
 
 ## Usage
 
