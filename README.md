@@ -17,8 +17,12 @@ the host machine.
 
 ---
 
-* [Usage](#usage)
-* [Contributing](#contributing)
+- [Usage](#usage)
+
+* [Customizing](#customizing)
+  - [inputs](#inputs)
+
+- [Contributing](#contributing)
 
 ## Usage
 
@@ -40,6 +44,18 @@ the host machine.
     # omctl alias is also supported
     omctl --version
 ```
+
+## Customizing
+
+### inputs
+
+The following inputs can be used as `step.with` keys:
+
+| Name       | Type   | Description                                       |
+| ---------- | ------ | ------------------------------------------------- |
+| `email`    | String | Email of the user used to log in to Omnistrate    |
+| `password` | String | Password of the user used to log in to Omnistrate |
+| `version`  | String | Version of the CTL to used (default:latest)       |
 
 ## Contributing
 
