@@ -66,4 +66,7 @@ project in the [CONTRIBUTING.md](/.github/CONTRIBUTING.md)
 
 # About Omnistrate
 
-[Omnistrate](#https://omnistrate.com/) is the operating system for your SaaS, offering enterprise-grade capabilities: automated provisioning, serverless capabilities, auto-scaling, billing, monitoring, centralized logging, self-healing, intelligent patching and much more!
+[Omnistrate](#https://omnistrate.com/) is the operating system for your SaaS,
+offering enterprise-grade capabilities: automated provisioning, serverless
+capabilities, auto-scaling, billing, monitoring, centralized logging,
+self-healing, intelligent patching and much more!
