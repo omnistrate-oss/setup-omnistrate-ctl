@@ -15,29 +15,16 @@ export async function install(): Promise<void> {
     const url = resolveUrl(PLATFORM, ARCHITECTURE, VERSION)
     core.debug(`Resolved url: ${url}`)
     // Install the resolved version if necessary
-    let useCache = false
-    let toolPath = toolCache.find('omnistrate-ctl', VERSION)
+    const toolPath = toolCache.find('omnistrate-ctl', VERSION)
     const toolPath2 = toolCache.find('omctl', VERSION)
     if (VERSION !== 'latest' && toolPath && toolPath2) {
-      useCache = true
-    }
-    if (useCache) {
+      // use cache
       core.addPath(toolPath)
       core.addPath(toolPath2)
     } else {
-      toolPath = await installCtl(url, VERSION)
+      await installCtl(url, VERSION)
     }
 
-    // Check the version of the installed tool
-    let execPath = `${toolPath}/omnistrate-ctl`
-    if (PLATFORM === 'windows') {
-      execPath += '.exe'
-    }
-    const exitCode = await exec.exec(execPath, ['--version'])
-    if (exitCode !== 0) {
-      core.setFailed('Failed to check the version of the installed')
-      return
-    }
     // Login to the Omnistrate CLI with the provided credentials
     const email = core.getInput('email')
     const password = core.getInput('password')
@@ -53,7 +40,7 @@ export async function install(): Promise<void> {
   }
 }
 
-function resolveUrl(
+export function resolveUrl(
   platform: string,
   architecture: string,
   version: string
@@ -68,10 +55,9 @@ function resolveUrl(
   return url
 }
 
-async function installCtl(url: string, version: string): Promise<string> {
+async function installCtl(url: string, version: string): Promise<void> {
   const downloadedPath = await toolCache.downloadTool(url)
-  core.setCommandEcho
-  core.info(`Acquired omnistrate-ctl:${version} from ${url}`)
+  core.info(`Requested omnistrate-ctl:${version} from ${url}`)
   let extension = ''
   if (PLATFORM === 'windows') {
     extension = '.exe'
@@ -97,14 +83,12 @@ async function installCtl(url: string, version: string): Promise<string> {
 
   // Set execution permissions for the cached tool
   if (PLATFORM !== 'windows') {
-    fs.chmodSync(path.join(cachedPath, `omnistrate-ctl${extension}`), '755')
-    fs.chmodSync(path.join(cachedPathAlias, `omctl${extension}`), '755')
+    fs.chmodSync(path.join(cachedPath, `omnistrate-ctl`), '755')
+    fs.chmodSync(path.join(cachedPathAlias, `omctl`), '755')
   }
-
-  return cachedPath
 }
 
-async function login(email: string, password: string): Promise<void> {
+export async function login(email: string, password: string): Promise<void> {
   try {
     const exitCode = await exec.exec('omnistrate-ctl login', [
       '--email',
@@ -130,11 +114,11 @@ export async function logout(): Promise<void> {
     // logout of the Omnistrate CLI
     const exitCode = await exec.exec('omnistrate-ctl logout')
     if (exitCode !== 0) {
-      console.warn('Failed to logout of Omnistrate CLI')
+      console.warn('Failed to logout from Omnistrate CLI')
       return
     }
     console.info('Logged out of Omnistrate CLI')
   } catch (error) {
-    console.warn('Failed to logout of Omnistrate CLI - ', error)
+    console.warn('Failed to logout from Omnistrate CLI', error)
   }
 }

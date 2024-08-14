@@ -28812,10 +28812,20 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PLATFORM = exports.ARCHITECTURE = exports.VERSION = void 0;
+exports.getVersion = getVersion;
+exports.getArchitecture = getArchitecture;
+exports.getPlatform = getPlatform;
 const core = __importStar(__nccwpck_require__(2186));
-exports.VERSION = core.getInput('version');
-exports.ARCHITECTURE = (() => {
-    const arch = process.arch;
+exports.VERSION = getVersion();
+function getVersion() {
+    const version = core.getInput('version');
+    if (version) {
+        return version;
+    }
+    return 'latest';
+}
+exports.ARCHITECTURE = getArchitecture(process.arch);
+function getArchitecture(arch) {
     switch (arch) {
         case 'arm64': {
             return 'arm64';
@@ -28827,9 +28837,9 @@ exports.ARCHITECTURE = (() => {
             throw new Error(arch);
         }
     }
-})();
-exports.PLATFORM = (() => {
-    const platform = process.platform;
+}
+exports.PLATFORM = getPlatform(process.platform);
+function getPlatform(platform) {
     switch (platform) {
         case 'darwin': {
             return 'darwin';
@@ -28844,7 +28854,7 @@ exports.PLATFORM = (() => {
             throw new Error(platform);
         }
     }
-})();
+}
 
 
 /***/ }),
@@ -28879,6 +28889,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.install = install;
+exports.resolveUrl = resolveUrl;
+exports.login = login;
 exports.logout = logout;
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
@@ -28896,28 +28908,15 @@ async function install() {
         const url = resolveUrl(constants_1.PLATFORM, constants_1.ARCHITECTURE, constants_1.VERSION);
         core.debug(`Resolved url: ${url}`);
         // Install the resolved version if necessary
-        let useCache = false;
-        let toolPath = toolCache.find('omnistrate-ctl', constants_1.VERSION);
+        const toolPath = toolCache.find('omnistrate-ctl', constants_1.VERSION);
         const toolPath2 = toolCache.find('omctl', constants_1.VERSION);
         if (constants_1.VERSION !== 'latest' && toolPath && toolPath2) {
-            useCache = true;
-        }
-        if (useCache) {
+            // use cache
             core.addPath(toolPath);
             core.addPath(toolPath2);
         }
         else {
-            toolPath = await installCtl(url, constants_1.VERSION);
-        }
-        // Check the version of the installed tool
-        let execPath = `${toolPath}/omnistrate-ctl`;
-        if (constants_1.PLATFORM === 'windows') {
-            execPath += '.exe';
-        }
-        const exitCode = await exec.exec(execPath, ['--version']);
-        if (exitCode !== 0) {
-            core.setFailed('Failed to check the version of the installed');
-            return;
+            await installCtl(url, constants_1.VERSION);
         }
         // Login to the Omnistrate CLI with the provided credentials
         const email = core.getInput('email');
@@ -28947,8 +28946,7 @@ function resolveUrl(platform, architecture, version) {
 }
 async function installCtl(url, version) {
     const downloadedPath = await toolCache.downloadTool(url);
-    core.setCommandEcho;
-    core.info(`Acquired omnistrate-ctl:${version} from ${url}`);
+    core.info(`Requested omnistrate-ctl:${version} from ${url}`);
     let extension = '';
     if (constants_1.PLATFORM === 'windows') {
         extension = '.exe';
@@ -28963,10 +28961,9 @@ async function installCtl(url, version) {
     core.debug('Added omctl to the path');
     // Set execution permissions for the cached tool
     if (constants_1.PLATFORM !== 'windows') {
-        fs.chmodSync(path.join(cachedPath, `omnistrate-ctl${extension}`), '755');
-        fs.chmodSync(path.join(cachedPathAlias, `omctl${extension}`), '755');
+        fs.chmodSync(path.join(cachedPath, `omnistrate-ctl`), '755');
+        fs.chmodSync(path.join(cachedPathAlias, `omctl`), '755');
     }
-    return cachedPath;
 }
 async function login(email, password) {
     try {
@@ -28995,13 +28992,13 @@ async function logout() {
         // logout of the Omnistrate CLI
         const exitCode = await exec.exec('omnistrate-ctl logout');
         if (exitCode !== 0) {
-            console.warn('Failed to logout of Omnistrate CLI');
+            console.warn('Failed to logout from Omnistrate CLI');
             return;
         }
         console.info('Logged out of Omnistrate CLI');
     }
     catch (error) {
-        console.warn('Failed to logout of Omnistrate CLI - ', error);
+        console.warn('Failed to logout from Omnistrate CLI', error);
     }
 }
 
