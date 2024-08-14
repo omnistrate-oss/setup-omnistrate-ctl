@@ -32,8 +32,8 @@ the host machine.
 - name: Setup Omnistrate CTL
   uses: omnistrate/setup-omnistrate-ctl@v1
   with:
-    email: ${{ secrets.OMNISTRATE_USERNAME }} # OPTIONAL
-    password: ${{ secrets.OMNISTRATE_PASSWORD }} # OPTIONAL
+    email: ${{ secrets.OMNISTRATE_USERNAME }}
+    password: ${{ secrets.OMNISTRATE_PASSWORD }}
     version: latest # OPTIONAL
 
 # Execute and example command
