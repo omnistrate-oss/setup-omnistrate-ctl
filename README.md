@@ -63,3 +63,7 @@ The following inputs can be used as `step.with` keys:
 
 Want to contribute? Awesome! You can find information about contributing to this
 project in the [CONTRIBUTING.md](/.github/CONTRIBUTING.md)
+
+# About Omnistrate
+
+[Omnistrate](#https://omnistrate.com/) is the operating system for your SaaS, offering enterprise-grade capabilities: automated provisioning, serverless capabilities, auto-scaling, billing, monitoring, centralized logging, self-healing, intelligent patching and much more!
