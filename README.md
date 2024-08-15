@@ -23,6 +23,9 @@ the host machine.
 - [Customizing](#customizing)
   - [inputs](#inputs)
 - [Contributing](#contributing)
+- [About Omnistrate](#about-omnistrate)
+
+---
 
 ---
 
