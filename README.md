@@ -59,7 +59,7 @@ The following inputs can be used as `step.with` keys:
 | `password` | String | Password of the user used to log in to Omnistrate |
 | `version`  | String | Version of the CTL to used (default:latest)       |
 
-# Contributing
+## Contributing
 
 Want to contribute? Awesome! You can find information about contributing to this
 project in the [CONTRIBUTING.md](/.github/CONTRIBUTING.md)
