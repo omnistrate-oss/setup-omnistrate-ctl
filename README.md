@@ -27,6 +27,8 @@ the host machine.
 
 ---
 
+---
+
 ## Usage
 
 - **Create secrets in your repository for your Omnistrate email and password**
