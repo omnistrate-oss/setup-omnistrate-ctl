@@ -43,6 +43,7 @@ the host machine.
 
 # Execute and example command
 - name: Test CTL command
+  shell: bash
   run: |
     # rum simple command as an example
     omnistrate-ctl --version
