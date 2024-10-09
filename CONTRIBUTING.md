@@ -12,17 +12,17 @@ contributions can be easily integrated into the project.
 
 2. Clone your fork:
 
-```
-git clone https://github.com/omnistrate/setup-omnistrate-ctl.git
-cd repository-name
-```
+    ```bash
+    git clone https://github.com/omnistrate/setup-omnistrate-ctl.git
+    cd repository-name
+    ```
 
 3. Create a branch: Create a new branch for every change you make. Use a
    descriptive branch name:
 
-```
-git checkout -b feature/your-feature-name
-```
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
 
 ## Making Changes
 
@@ -38,10 +38,10 @@ git checkout -b feature/your-feature-name
 
 1. Ensure your branch is up to date with the main branch:
 
-```
-git fetch origin
-git merge origin/main
-```
+    ```bash
+    git fetch origin
+    git merge origin/main
+    ```
 
 2. Run tests: Ensure all tests pass and add tests for any new functionality.
 
