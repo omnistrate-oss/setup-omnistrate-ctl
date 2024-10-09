@@ -5,11 +5,13 @@ Thank you for considering contributing to this project! We welcome all contribut
 ## Getting Started
 
 1. Fork the repository: Click the "Fork" button at the top right of the GitHub repository.
+
 2. Clone your fork:
 ```
 git clone https://github.com/omnistrate/setup-omnistrate-ctl.git
 cd repository-name
 ```
+
 3. Create a branch: Create a new branch for every change you make. Use a descriptive branch name:
 ```
 git checkout -b feature/your-feature-name
@@ -18,8 +20,10 @@ git checkout -b feature/your-feature-name
 ## Making Changes
 
 1. Ensure each change is isolated in its own branch.
+
 2. Use clear, descriptive commit messages for every change. For example:
 "Fix bug in user login" or "Add feature to export user data"
+
 3. Make sure your code follows the project’s coding style and is properly documented.
 
 ## Submitting a Pull Request
@@ -29,10 +33,15 @@ git checkout -b feature/your-feature-name
 git fetch origin
 git merge origin/main
 ```
+
 2. Run tests: Ensure all tests pass and add tests for any new functionality.
+
 3. Create a Pull Request for every change:
-- Go to your forked repository and click "New Pull Request."
-- Provide a detailed description of the change, and the issue(s) addressed, if applicable.
+
+    - Go to your forked repository and click "New Pull Request."
+
+    - Provide a detailed description of the change, and the issue(s) addressed, if applicable.
+
 4. Link Issues: If your change addresses any GitHub issues, mention them in your PR description by using the syntax Fixes #issue-number.
 
 ## Review Process
