@@ -66,7 +66,7 @@ The following inputs can be used as `step.with` keys:
 ## Contributing
 
 Want to contribute? Awesome! You can find information about contributing to this
-project in the [CONTRIBUTING.md](/.github/CONTRIBUTING.md)
+project in the [CONTRIBUTING](/CONTRIBUTING.md) page
 
 ## About Omnistrate
 
