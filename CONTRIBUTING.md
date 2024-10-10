@@ -39,7 +39,7 @@ contributions can be easily integrated into the project.
    git fetch origin
    git merge origin/main
    ```
-   
+
 2. Run tests: Ensure all tests pass and add tests for any new functionality.
 3. Create a Pull Request for every change:
    - Go to your forked repository and click "New Pull Request."
