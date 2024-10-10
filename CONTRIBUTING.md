@@ -10,12 +10,15 @@ contributions can be easily integrated into the project.
 1. Fork the repository: Click the "Fork" button at the top right of the GitHub
    repository.
 2. Clone your fork:
+
    ```bash
    git clone https://github.com/omnistrate/setup-omnistrate-ctl.git
    cd repository-name
    ```
+
 3. Create a branch: Create a new branch for every change you make. Use a
    descriptive branch name:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -31,10 +34,12 @@ contributions can be easily integrated into the project.
 ## Submitting a Pull Request
 
 1. Ensure your branch is up to date with the main branch:
+
    ```bash
    git fetch origin
    git merge origin/main
    ```
+   
 2. Run tests: Ensure all tests pass and add tests for any new functionality.
 3. Create a Pull Request for every change:
    - Go to your forked repository and click "New Pull Request."
