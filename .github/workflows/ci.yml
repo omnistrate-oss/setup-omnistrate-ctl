@@ -119,4 +119,4 @@ jobs:
           omctl --help
 
       - name: List Local Action CTL
-        run: omctl list
+        run: omctl service list
