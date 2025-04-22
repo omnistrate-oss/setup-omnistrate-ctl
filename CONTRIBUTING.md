@@ -12,7 +12,7 @@ contributions can be easily integrated into the project.
 1. Clone your fork:
 
    ```bash
-   git clone https://github.com/omnistrate/setup-omnistrate-ctl.git
+   git clone https://github.com/omnistrate-oss/setup-omnistrate-ctl.git
    cd repository-name
    ```
 
@@ -68,6 +68,6 @@ contributions can be easily integrated into the project.
 ## Issues
 
 Feel free to report bugs or suggest features by opening a new
-[issue](https://github.com/omnistrate/setup-omnistrate-ctl/issues). Before
+[issue](https://github.com/omnistrate-oss/setup-omnistrate-ctl/issues). Before
 submitting, check if the issue already exists. If so, feel free to comment on
 it.
