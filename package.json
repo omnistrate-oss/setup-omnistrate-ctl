@@ -72,7 +72,7 @@
     "@actions/github": "^6.0.0",
     "@actions/tool-cache": "^2.0.1",
     "jest-fetch-mock": "^3.0.3",
-    "npm": "^10.8.3"
+    "npm": "^11.3.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
