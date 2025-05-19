@@ -1,5 +1,5 @@
-.PHONY: build
-build:
+.PHONY: bundle
+bundle:
 	@npm run bundle
 
 .PHONY: install
