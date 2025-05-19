@@ -5,3 +5,9 @@ build:
 .PHONY: install
 install:
 	@npm install
+
+.PHONY: updateV1
+updateV1:
+	@git checkout main
+	@git tag -f v1
+	@git push -f origin v1
