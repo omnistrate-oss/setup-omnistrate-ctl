@@ -112,12 +112,10 @@ async function installCtl(url, version) {
 }
 async function login(email, password) {
     try {
-        const exitCode = await exec.exec('omnistrate-ctl login', [
-            '--email',
-            email,
-            '--password',
-            password
-        ]);
+        const exitCode = await exec.exec(
+            'echo "' + password + '" | ' +
+            'omnistrate-ctl login --email ' + email + ' --password-stdin'
+        );
         if (exitCode !== 0) {
             core.setFailed('Failed to login to Omnistrate CLI');
             return;
