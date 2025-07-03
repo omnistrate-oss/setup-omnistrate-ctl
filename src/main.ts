@@ -50,7 +50,7 @@ export function resolveUrl(
     url = `https://github.com/omnistrate-oss/omnistrate-ctl/releases/latest/download/omnistrate-ctl-${platform}-${architecture}`
   }
   if (platform === 'windows') {
-    url += '.zip'
+    url += '.exe.zip'
   } else {
     url += '.tar.gz'
   }
