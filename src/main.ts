@@ -67,10 +67,7 @@ async function installCtl(url: string, version: string): Promise<void> {
   }
 
   // Create a destination directory for extraction
-  const extractDestination = path.join(
-    process.env.RUNNER_TEMP || '/tmp',
-    `omnistrate-ctl${extension}`
-  )
+  const extractDestination = process.env.RUNNER_TEMP || '/tmp'
 
   let extractedPath: string
   if (PLATFORM === 'windows') {
@@ -87,11 +84,19 @@ async function installCtl(url: string, version: string): Promise<void> {
       'xz'
     )
   }
+
   core.debug(`Successfully extracted to ${extractedPath}`)
+
+  let extractedFile: string
+  extractedFile = path.join(
+    extractedPath,
+    `omnistrate-ctl-${PLATFORM}-${ARCHITECTURE}${extension}`
+  )
+  core.debug(`Extracted path: ${extractedFile}`)
 
   // Find the extracted binary
   const cachedPath = await toolCache.cacheFile(
-    extractedPath,
+    extractedFile,
     `omnistrate-ctl${extension}`,
     'omnistrate-ctl',
     version
@@ -101,7 +106,7 @@ async function installCtl(url: string, version: string): Promise<void> {
   core.debug('Added omnistrate-ctl to the path')
 
   const cachedPathAlias = await toolCache.cacheFile(
-    extractedPath,
+    extractedFile,
     `omctl${extension}`,
     'omctl',
     version
