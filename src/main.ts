@@ -60,7 +60,7 @@ export function resolveUrl(
 async function installCtl(url: string, version: string): Promise<void> {
   const downloadedPath = await toolCache.downloadTool(url)
   core.info(`Requested omnistrate-ctl:${version} from ${url}`)
-  
+
   let extractedPath: string
   if (PLATFORM === 'windows') {
     // Extract zip file
@@ -70,21 +70,21 @@ async function installCtl(url: string, version: string): Promise<void> {
     extractedPath = await toolCache.extractTar(downloadedPath, undefined, 'xz')
   }
   core.debug(`Successfully extracted to ${extractedPath}`)
-  
+
   let extension = ''
   if (PLATFORM === 'windows') {
     extension = '.exe'
   }
-  
+
   // Find the extracted binary
   const binaryName = `omnistrate-ctl${extension}`
   const binaryPath = path.join(extractedPath, binaryName)
-  
+
   // Verify the binary exists
   if (!fs.existsSync(binaryPath)) {
     throw new Error(`Binary ${binaryName} not found in extracted archive`)
   }
-  
+
   const cachedPath = await toolCache.cacheFile(
     binaryPath,
     `omnistrate-ctl${extension}`,
@@ -94,7 +94,7 @@ async function installCtl(url: string, version: string): Promise<void> {
   core.debug(`Successfully cached omnistrate-ctl to ${cachedPath}`)
   core.addPath(cachedPath)
   core.debug('Added omnistrate-ctl to the path')
-  
+
   const cachedPathAlias = await toolCache.cacheFile(
     binaryPath,
     `omctl${extension}`,
