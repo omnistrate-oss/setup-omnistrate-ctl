@@ -80,9 +80,9 @@ async function install() {
     }
 }
 function resolveUrl(platform, architecture, version) {
-    let url = `https://github.com/omnistrate/cli/releases/download/${version}/omnistrate-ctl-${platform}-${architecture}`;
+    let url = `https://github.comomnistrate-oss/omnistrate-ctl/releases/download/${version}/omnistrate-ctl-${platform}-${architecture}`;
     if (version === 'latest') {
-        url = `https://github.com/omnistrate/cli/releases/latest/download/omnistrate-ctl-${platform}-${architecture}`;
+        url = `https://github.comomnistrate-oss/omnistrate-ctl/releases/latest/download/omnistrate-ctl-${platform}-${architecture}`;
     }
     if (platform === 'windows') {
         url += '.exe';
