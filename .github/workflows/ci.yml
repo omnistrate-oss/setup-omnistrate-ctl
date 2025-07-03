@@ -85,7 +85,7 @@ jobs:
         id: test-action-with-latest
         uses: ./
         with:
-          version: v0.9.34
+          version: v0.13.28
 
       - name: Test Local Action CTL
         run: |
