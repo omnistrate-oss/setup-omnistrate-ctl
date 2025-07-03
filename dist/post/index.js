@@ -28974,8 +28974,7 @@ async function installCtl(url, version) {
         extractedPath = await toolCache.extractTar(downloadedPath, extractDestination, 'xz');
     }
     core.debug(`Successfully extracted to ${extractedPath}`);
-    let extractedFile;
-    extractedFile = path.join(extractedPath, `omnistrate-ctl-${constants_1.PLATFORM}-${constants_1.ARCHITECTURE}${extension}`);
+    const extractedFile = path.join(extractedPath, `omnistrate-ctl-${constants_1.PLATFORM}-${constants_1.ARCHITECTURE}${extension}`);
     core.debug(`Extracted path: ${extractedFile}`);
     // Find the extracted binary
     const cachedPath = await toolCache.cacheFile(extractedFile, `omnistrate-ctl${extension}`, 'omnistrate-ctl', version);

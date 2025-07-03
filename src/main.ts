@@ -87,8 +87,7 @@ async function installCtl(url: string, version: string): Promise<void> {
 
   core.debug(`Successfully extracted to ${extractedPath}`)
 
-  let extractedFile: string
-  extractedFile = path.join(
+  const extractedFile = path.join(
     extractedPath,
     `omnistrate-ctl-${PLATFORM}-${ARCHITECTURE}${extension}`
   )
