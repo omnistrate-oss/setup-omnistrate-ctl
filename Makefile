@@ -1,3 +1,10 @@
+.PHONY: all
+all: ci bundle install
+
+.PHONY: ci
+ci: 
+	@npm ci
+
 .PHONY: bundle
 bundle:
 	@npm run bundle
