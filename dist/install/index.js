@@ -28963,7 +28963,7 @@ async function installCtl(url, version) {
         extension = '.exe';
     }
     // Create a destination directory for extraction
-    const extractDestination = path.join(process.env.RUNNER_TEMP || '/tmp', `omnistrate-ctl` + extension);
+    const extractDestination = path.join(process.env.RUNNER_TEMP || '/tmp', `omnistrate-ctl${extension}`);
     let extractedPath;
     if (constants_1.PLATFORM === 'windows') {
         // Extract zip file to specific destination
