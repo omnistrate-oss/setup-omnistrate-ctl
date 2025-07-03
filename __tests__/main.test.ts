@@ -117,7 +117,7 @@ describe('resolveUrl', () => {
     const platform = 'windows'
     const architecture = 'amd64'
     const version = 'latest'
-    const url = `https://github.com/omnistrate-oss/omnistrate-ctl/releases/latest/download/omnistrate-ctl-${platform}-${architecture}.zip`
+    const url = `https://github.com/omnistrate-oss/omnistrate-ctl/releases/latest/download/omnistrate-ctl-${platform}-${architecture}.exe.zip`
     expect(main.resolveUrl(platform, architecture, version)).toBe(url)
   })
 })
