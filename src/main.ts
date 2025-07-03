@@ -61,59 +61,37 @@ async function installCtl(url: string, version: string): Promise<void> {
   const downloadedPath = await toolCache.downloadTool(url)
   core.info(`Requested omnistrate-ctl:${version} from ${url}`)
 
-  // Create a destination directory for extraction
-  const extractDestination = path.join(process.env.RUNNER_TEMP || '/tmp', `omnistrate-ctl-${version}`)
-  
-  let extractedPath: string
-  if (PLATFORM === 'windows') {
-    // Extract zip file to specific destination
-    extractedPath = await toolCache.extractZip(downloadedPath, extractDestination)
-  } else {
-    // Extract tar.gz file to specific destination
-    extractedPath = await toolCache.extractTar(downloadedPath, extractDestination, 'xz')
-  }
-  core.debug(`Successfully extracted to ${extractedPath}`)
-
   let extension = ''
   if (PLATFORM === 'windows') {
     extension = '.exe'
   }
 
-  // Find the extracted binary
-  const binaryName = `omnistrate-ctl${extension}`
-  let binaryPath = path.join(extractedPath, binaryName)
+  // Create a destination directory for extraction
+  const extractDestination = path.join(
+    process.env.RUNNER_TEMP || '/tmp',
+    `omnistrate-ctl` + extension
+  )
 
-  // If binary is not found in root, search in subdirectories
-  if (!fs.existsSync(binaryPath)) {
-    core.debug(`Binary not found at ${binaryPath}, searching recursively...`)
-    
-    // List contents of extracted directory for debugging
-    const extractedContents = fs.readdirSync(extractedPath, { withFileTypes: true })
-    core.debug(`Extracted directory contents: ${extractedContents.map(entry => 
-      `${entry.name}${entry.isDirectory() ? '/' : ''}`
-    ).join(', ')}`)
-    
-    // Look for the binary in all subdirectories
-    let foundBinary = false
-    for (const entry of extractedContents) {
-      if (entry.isDirectory()) {
-        const subDirPath = path.join(extractedPath, entry.name, binaryName)
-        if (fs.existsSync(subDirPath)) {
-          binaryPath = subDirPath
-          foundBinary = true
-          core.debug(`Found binary at ${binaryPath}`)
-          break
-        }
-      }
-    }
-    
-    if (!foundBinary) {
-      throw new Error(`Binary ${binaryName} not found in extracted archive. Contents: ${extractedContents.map(e => e.name).join(', ')}`)
-    }
+  let extractedPath: string
+  if (PLATFORM === 'windows') {
+    // Extract zip file to specific destination
+    extractedPath = await toolCache.extractZip(
+      downloadedPath,
+      extractDestination
+    )
+  } else {
+    // Extract tar.gz file to specific destination
+    extractedPath = await toolCache.extractTar(
+      downloadedPath,
+      extractDestination,
+      'xz'
+    )
   }
+  core.debug(`Successfully extracted to ${extractedPath}`)
 
+  // Find the extracted binary
   const cachedPath = await toolCache.cacheFile(
-    binaryPath,
+    extractedPath,
     `omnistrate-ctl${extension}`,
     'omnistrate-ctl',
     version
@@ -123,7 +101,7 @@ async function installCtl(url: string, version: string): Promise<void> {
   core.debug('Added omnistrate-ctl to the path')
 
   const cachedPathAlias = await toolCache.cacheFile(
-    binaryPath,
+    extractedPath,
     `omctl${extension}`,
     'omctl',
     version

@@ -28958,14 +28958,16 @@ function resolveUrl(platform, architecture, version) {
 async function installCtl(url, version) {
     const downloadedPath = await toolCache.downloadTool(url);
     core.info(`Requested omnistrate-ctl:${version} from ${url}`);
+    // Create a destination directory for extraction
+    const extractDestination = path.join(process.env.RUNNER_TEMP || '/tmp', `omnistrate-ctl-${version}`);
     let extractedPath;
     if (constants_1.PLATFORM === 'windows') {
-        // Extract zip file
-        extractedPath = await toolCache.extractZip(downloadedPath);
+        // Extract zip file to specific destination
+        extractedPath = await toolCache.extractZip(downloadedPath, extractDestination);
     }
     else {
-        // Extract tar.gz file
-        extractedPath = await toolCache.extractTar(downloadedPath, undefined, 'xz');
+        // Extract tar.gz file to specific destination
+        extractedPath = await toolCache.extractTar(downloadedPath, extractDestination, 'xz');
     }
     core.debug(`Successfully extracted to ${extractedPath}`);
     let extension = '';
@@ -28974,10 +28976,33 @@ async function installCtl(url, version) {
     }
     // Find the extracted binary
     const binaryName = `omnistrate-ctl${extension}`;
-    const binaryPath = path.join(extractedPath, binaryName);
-    // Verify the binary exists
+    let binaryPath = path.join(extractedPath, binaryName);
+    // If binary is not found in root, search in subdirectories
     if (!fs.existsSync(binaryPath)) {
-        throw new Error(`Binary ${binaryName} not found in extracted archive`);
+        core.debug(`Binary not found at ${binaryPath}, searching recursively...`);
+        // List contents of extracted directory for debugging
+        const extractedContents = fs.readdirSync(extractedPath, {
+            withFileTypes: true
+        });
+        core.debug(`Extracted directory contents: ${extractedContents
+            .map(entry => `${entry.name}${entry.isDirectory() ? '/' : ''}`)
+            .join(', ')}`);
+        // Look for the binary in all subdirectories
+        let foundBinary = false;
+        for (const entry of extractedContents) {
+            if (entry.isDirectory()) {
+                const subDirPath = path.join(extractedPath, entry.name, binaryName);
+                if (fs.existsSync(subDirPath)) {
+                    binaryPath = subDirPath;
+                    foundBinary = true;
+                    core.debug(`Found binary at ${binaryPath}`);
+                    break;
+                }
+            }
+        }
+        if (!foundBinary) {
+            throw new Error(`Binary ${binaryName} not found in extracted archive. Contents: ${extractedContents.map(e => e.name).join(', ')}`);
+        }
     }
     const cachedPath = await toolCache.cacheFile(binaryPath, `omnistrate-ctl${extension}`, 'omnistrate-ctl', version);
     core.debug(`Successfully cached omnistrate-ctl to ${cachedPath}`);
