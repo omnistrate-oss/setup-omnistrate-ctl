@@ -45,12 +45,14 @@ export function resolveUrl(
   architecture: string,
   version: string
 ): string {
-  let url = `https://github.com/omnistrate/cli/releases/download/${version}/omnistrate-ctl-${platform}-${architecture}`
+  let url = `https://github.com/omnistrate-oss/omnistrate-ctl/releases/download/${version}/omnistrate-ctl-${platform}-${architecture}`
   if (version === 'latest') {
-    url = `https://github.com/omnistrate/cli/releases/latest/download/omnistrate-ctl-${platform}-${architecture}`
+    url = `https://github.com/omnistrate-oss/omnistrate-ctl/releases/latest/download/omnistrate-ctl-${platform}-${architecture}`
   }
   if (platform === 'windows') {
-    url += '.exe'
+    url += '.exe.zip'
+  } else {
+    url += '.tar.gz'
   }
   return url
 }
@@ -58,12 +60,42 @@ export function resolveUrl(
 async function installCtl(url: string, version: string): Promise<void> {
   const downloadedPath = await toolCache.downloadTool(url)
   core.info(`Requested omnistrate-ctl:${version} from ${url}`)
+
   let extension = ''
   if (PLATFORM === 'windows') {
     extension = '.exe'
   }
+
+  // Create a destination directory for extraction
+  const extractDestination = process.env.RUNNER_TEMP || '/tmp'
+
+  let extractedPath: string
+  if (PLATFORM === 'windows') {
+    // Extract zip file to specific destination
+    extractedPath = await toolCache.extractZip(
+      downloadedPath,
+      extractDestination
+    )
+  } else {
+    // Extract tar.gz file to specific destination
+    extractedPath = await toolCache.extractTar(
+      downloadedPath,
+      extractDestination,
+      'xz'
+    )
+  }
+
+  core.debug(`Successfully extracted to ${extractedPath}`)
+
+  const extractedFile = path.join(
+    extractedPath,
+    `omnistrate-ctl-${PLATFORM}-${ARCHITECTURE}${extension}`
+  )
+  core.debug(`Extracted path: ${extractedFile}`)
+
+  // Find the extracted binary
   const cachedPath = await toolCache.cacheFile(
-    downloadedPath,
+    extractedFile,
     `omnistrate-ctl${extension}`,
     'omnistrate-ctl',
     version
@@ -71,8 +103,9 @@ async function installCtl(url: string, version: string): Promise<void> {
   core.debug(`Successfully cached omnistrate-ctl to ${cachedPath}`)
   core.addPath(cachedPath)
   core.debug('Added omnistrate-ctl to the path')
+
   const cachedPathAlias = await toolCache.cacheFile(
-    downloadedPath,
+    extractedFile,
     `omctl${extension}`,
     'omctl',
     version

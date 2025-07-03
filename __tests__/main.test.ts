@@ -103,21 +103,21 @@ describe('resolveUrl', () => {
     const platform = 'darwin'
     const architecture = 'arm64'
     const version = 'latest'
-    const url = `https://github.com/omnistrate/cli/releases/latest/download/omnistrate-ctl-${platform}-${architecture}`
+    const url = `https://github.com/omnistrate-oss/omnistrate-ctl/releases/latest/download/omnistrate-ctl-${platform}-${architecture}.tar.gz`
     expect(main.resolveUrl(platform, architecture, version)).toBe(url)
   })
   it('should return the correct URL for linux x64 1.0.0', () => {
     const platform = 'linux'
     const architecture = 'x64'
     const version = '1.0.0'
-    const url = `https://github.com/omnistrate/cli/releases/download/${version}/omnistrate-ctl-${platform}-${architecture}`
+    const url = `https://github.com/omnistrate-oss/omnistrate-ctl/releases/download/${version}/omnistrate-ctl-${platform}-${architecture}.tar.gz`
     expect(main.resolveUrl(platform, architecture, version)).toBe(url)
   })
   it('should return the correct URL for windows amd64 latest', () => {
     const platform = 'windows'
     const architecture = 'amd64'
     const version = 'latest'
-    const url = `https://github.com/omnistrate/cli/releases/latest/download/omnistrate-ctl-${platform}-${architecture}.exe`
+    const url = `https://github.com/omnistrate-oss/omnistrate-ctl/releases/latest/download/omnistrate-ctl-${platform}-${architecture}.exe.zip`
     expect(main.resolveUrl(platform, architecture, version)).toBe(url)
   })
 })

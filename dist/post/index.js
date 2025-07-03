@@ -28360,12 +28360,15 @@ async function install() {
     }
 }
 function resolveUrl(platform, architecture, version) {
-    let url = `https://github.com/omnistrate/cli/releases/download/${version}/omnistrate-ctl-${platform}-${architecture}`;
+    let url = `https://github.com/omnistrate-oss/omnistrate-ctl/releases/download/${version}/omnistrate-ctl-${platform}-${architecture}`;
     if (version === 'latest') {
-        url = `https://github.com/omnistrate/cli/releases/latest/download/omnistrate-ctl-${platform}-${architecture}`;
+        url = `https://github.com/omnistrate-oss/omnistrate-ctl/releases/latest/download/omnistrate-ctl-${platform}-${architecture}`;
     }
     if (platform === 'windows') {
-        url += '.exe';
+        url += '.exe.zip';
+    }
+    else {
+        url += '.tar.gz';
     }
     return url;
 }
@@ -28376,11 +28379,26 @@ async function installCtl(url, version) {
     if (constants_1.PLATFORM === 'windows') {
         extension = '.exe';
     }
-    const cachedPath = await toolCache.cacheFile(downloadedPath, `omnistrate-ctl${extension}`, 'omnistrate-ctl', version);
+    // Create a destination directory for extraction
+    const extractDestination = process.env.RUNNER_TEMP || '/tmp';
+    let extractedPath;
+    if (constants_1.PLATFORM === 'windows') {
+        // Extract zip file to specific destination
+        extractedPath = await toolCache.extractZip(downloadedPath, extractDestination);
+    }
+    else {
+        // Extract tar.gz file to specific destination
+        extractedPath = await toolCache.extractTar(downloadedPath, extractDestination, 'xz');
+    }
+    core.debug(`Successfully extracted to ${extractedPath}`);
+    const extractedFile = path.join(extractedPath, `omnistrate-ctl-${constants_1.PLATFORM}-${constants_1.ARCHITECTURE}${extension}`);
+    core.debug(`Extracted path: ${extractedFile}`);
+    // Find the extracted binary
+    const cachedPath = await toolCache.cacheFile(extractedFile, `omnistrate-ctl${extension}`, 'omnistrate-ctl', version);
     core.debug(`Successfully cached omnistrate-ctl to ${cachedPath}`);
     core.addPath(cachedPath);
     core.debug('Added omnistrate-ctl to the path');
-    const cachedPathAlias = await toolCache.cacheFile(downloadedPath, `omctl${extension}`, 'omctl', version);
+    const cachedPathAlias = await toolCache.cacheFile(extractedFile, `omctl${extension}`, 'omctl', version);
     core.debug(`Successfully cached omctl to ${cachedPathAlias}`);
     core.addPath(cachedPathAlias);
     core.debug('Added omctl to the path');
