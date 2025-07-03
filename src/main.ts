@@ -69,7 +69,7 @@ async function installCtl(url: string, version: string): Promise<void> {
   // Create a destination directory for extraction
   const extractDestination = path.join(
     process.env.RUNNER_TEMP || '/tmp',
-    `omnistrate-ctl` + extension
+    `omnistrate-ctl${extension}`
   )
 
   let extractedPath: string
