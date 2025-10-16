@@ -29,7 +29,7 @@
     "coverage": "npx make-coverage-badge --output-path ./badges/coverage.svg",
     "format:write": "npx prettier --write .",
     "format:check": "npx prettier --check .",
-    "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
+    "lint": "npx eslint .",
     "package-install": "npx ncc build src/install.ts -o dist/install --source-map --license licenses.txt",
     "package-post": "npx ncc build src/post.ts -o dist/post --source-map --license licenses.txt",
     "package:watch": "npm run package -- --watch",
@@ -75,13 +75,14 @@
     "npm": "^11.6.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.37.0",
     "@jest/globals": "^30.2.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.7.2",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.1",
+    "@typescript-eslint/parser": "^8.46.1",
     "@vercel/ncc": "^0.38.4",
-    "eslint": "^8.57.1",
+    "eslint": "^9.37.0",
     "eslint-plugin-github": "^5.0.2",
     "eslint-plugin-jest": "^28.14.0",
     "eslint-plugin-jsonc": "^2.21.0",
@@ -91,6 +92,7 @@
     "prettier": "^3.6.2",
     "prettier-eslint": "^16.4.2",
     "ts-jest": "^29.4.5",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.1"
   }
 }

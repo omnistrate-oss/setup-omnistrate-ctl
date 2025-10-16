@@ -44,6 +44,13 @@ jobs:
           FILTER_REGEX_EXCLUDE: dist/**/*
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: true
+          # Disable JavaScript/TypeScript linting in super-linter
+          # The CI workflow handles this with ESLint 9
+          VALIDATE_JAVASCRIPT_ES: false
           VALIDATE_JAVASCRIPT_STANDARD: false
-          VALIDATE_JSCPD: false
+          VALIDATE_TYPESCRIPT_ES: false
           VALIDATE_TYPESCRIPT_STANDARD: false
+          VALIDATE_JSX: false
+          VALIDATE_TSX: false
+          VALIDATE_JSON: false
+          VALIDATE_JSCPD: false
