@@ -72,7 +72,7 @@
     "@actions/github": "^9.0.0",
     "@actions/tool-cache": "^2.0.2",
     "jest-fetch-mock": "^3.0.3",
-    "npm": "^11.10.0"
+    "npm": "^11.11.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
