@@ -45,7 +45,7 @@ the host machine.
 - name: Test CTL command
   shell: bash
   run: |
-    # rum simple command as an example
+    # run simple command as an example
     omnistrate-ctl --version
     # omctl alias is also supported
     omctl --version
