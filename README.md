@@ -60,12 +60,12 @@ by default.
 
 The following inputs can be used as `step.with` keys:
 
-| Name       | Type   | Description                                                            |
-| ---------- | ------ | ---------------------------------------------------------------------- |
-| `email`    | String | Email of the user used to log in to Omnistrate                         |
-| `password` | String | Password of the user used to log in to Omnistrate                      |
-| `version`  | String | Version of the CTL to use (default: `latest`)                          |
-| `logout`   | String | Run `omnistrate-ctl logout` after the job completes (default: `false`) |
+| Name       | Type   | Description                              |
+| ---------- | ------ | ---------------------------------------- |
+| `email`    | String | Email to log in to Omnistrate            |
+| `password` | String | Password to log in to Omnistrate         |
+| `version`  | String | CTL version (default: `latest`)          |
+| `logout`   | String | Logout after the job (default: `false`)  |
 
 ## Contributing
 
