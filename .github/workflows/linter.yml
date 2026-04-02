@@ -55,3 +55,6 @@ jobs:
           VALIDATE_TSX: false
           VALIDATE_JSON: false
           VALIDATE_JSCPD: false
+          # Biome duplicates ESLint; disable to avoid conflicts
+          VALIDATE_JAVASCRIPT_BIOME: false
+          VALIDATE_TYPESCRIPT_BIOME: false
