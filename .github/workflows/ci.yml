@@ -117,3 +117,66 @@ jobs:
         run: |
           omnistrate-ctl --version
           omctl --help
+
+  test-action-logout:
+    name: GitHub Actions Test Logout
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v6
+
+      - name: Login with logout enabled
+        id: test-action-login
+        uses: ./
+        with:
+          email: ${{ secrets.OMNISTRATE_ACCOUNT_EMAIL }}
+          password: '${{ secrets.OMNISTRATE_ACCOUNT_PASSWORD }}'
+          logout: true
+
+      - name: Verify token exists after login
+        shell: bash
+        run: |
+          if [ ! -d "$HOME/.omnistrate" ]; then
+            echo "::error::Expected ~/.omnistrate/ to exist"
+            exit 1
+          fi
+          echo "✓ ~/.omnistrate/ exists after login"
+
+      # Post step runs "omnistrate-ctl logout" because logout: true
+
+  test-action-no-logout:
+    name: GitHub Actions Test No Logout
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v6
+
+      - name: Login without logout
+        id: test-action-no-logout
+        uses: ./
+        with:
+          email: ${{ secrets.OMNISTRATE_ACCOUNT_EMAIL }}
+          password: '${{ secrets.OMNISTRATE_ACCOUNT_PASSWORD }}'
+
+      - name: Verify token exists (post step skipped)
+        shell: bash
+        run: |
+          if [ ! -d "$HOME/.omnistrate" ]; then
+            echo "::error::Expected ~/.omnistrate/ to exist"
+            exit 1
+          fi
+          echo "✓ ~/.omnistrate/ exists (no logout, token retained)"
