@@ -10,8 +10,8 @@ async function run(): Promise<void> {
     await logout()
   } else {
     core.debug('Skipping logout (logout input is not set to "true")')
+    await cleanup()
   }
-  await cleanup()
 }
 
 run()

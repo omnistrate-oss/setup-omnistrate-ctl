@@ -28518,8 +28518,8 @@ async function run() {
     }
     else {
         core.debug('Skipping logout (logout input is not set to "true")');
+        await (0, main_1.cleanup)();
     }
-    await (0, main_1.cleanup)();
 }
 run();
 

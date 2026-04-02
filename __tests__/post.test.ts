@@ -26,7 +26,7 @@ describe('post', () => {
     mockDebug.mockClear()
   })
 
-  it('calls logout and cleanup when logout input is "true"', async () => {
+  it('calls logout without cleanup when logout input is "true"', async () => {
     mockGetInput.mockReturnValue('true')
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -35,10 +35,10 @@ describe('post', () => {
 
     expect(mockGetInput).toHaveBeenCalledWith('logout')
     expect(mockLogout).toHaveBeenCalled()
-    expect(mockCleanup).toHaveBeenCalled()
+    expect(mockCleanup).not.toHaveBeenCalled()
   })
 
-  it('skips logout but still cleans up when input is empty', async () => {
+  it('skips logout but cleans up when input is empty', async () => {
     mockGetInput.mockReturnValue('')
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -50,7 +50,7 @@ describe('post', () => {
     expect(mockCleanup).toHaveBeenCalled()
   })
 
-  it('skips logout but still cleans up when input is "false"', async () => {
+  it('skips logout but cleans up when input is "false"', async () => {
     mockGetInput.mockReturnValue('false')
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports
