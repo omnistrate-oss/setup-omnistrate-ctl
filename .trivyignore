@@ -1,0 +1,11 @@
+# Vulnerabilities in npm's own bundled node_modules (dev dependency only).
+# These cannot be fixed via overrides or npm audit fix — they require
+# a new npm release with patched internal dependencies.
+# None of these packages are shipped in the GitHub Action dist/ bundle.
+
+# brace-expansion 4.0.0-5.0.4 (bundled in npm)
+CVE-2026-33750
+
+# picomatch 4.0.0-4.0.3 (bundled in npm's tinyglobby)
+CVE-2026-33671
+CVE-2026-33672
