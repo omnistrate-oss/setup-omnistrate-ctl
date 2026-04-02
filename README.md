@@ -13,9 +13,11 @@ create and operate Omnistrate services. It allows to setup a email and password
 to use to login to Omnistrate, we recommend storing the email and passwords as
 secrets in GitHub and reference those secrets from the Action. It also allows to
 optionally set up a version of the Omnistrate CTL command to use or uses latest
-by default. Using this action ensures that the logout command is executed at the
-end of the workflow so the temporal token to access Omnistrate is removed from
-the host machine.
+by default.
+
+> **Note:** By default, the action does **not** run `omnistrate-ctl logout`
+> after the workflow completes. If you want the temporary access token to be
+> removed from the runner at the end of the job, set `logout: true`.
 
 ---
 
@@ -40,6 +42,7 @@ the host machine.
     email: ${{ secrets.OMNISTRATE_USERNAME }}
     password: ${{ secrets.OMNISTRATE_PASSWORD }}
     version: latest # OPTIONAL
+    logout: true # OPTIONAL — set to "true" to logout after the job completes
 
 # Execute and example command
 - name: Test CTL command
@@ -57,11 +60,12 @@ the host machine.
 
 The following inputs can be used as `step.with` keys:
 
-| Name       | Type   | Description                                       |
-| ---------- | ------ | ------------------------------------------------- |
-| `email`    | String | Email of the user used to log in to Omnistrate    |
-| `password` | String | Password of the user used to log in to Omnistrate |
-| `version`  | String | Version of the CTL to used (default:latest)       |
+| Name       | Type   | Description                                                            |
+| ---------- | ------ | ---------------------------------------------------------------------- |
+| `email`    | String | Email of the user used to log in to Omnistrate                         |
+| `password` | String | Password of the user used to log in to Omnistrate                      |
+| `version`  | String | Version of the CTL to use (default: `latest`)                          |
+| `logout`   | String | Run `omnistrate-ctl logout` after the job completes (default: `false`) |
 
 ## Contributing
 

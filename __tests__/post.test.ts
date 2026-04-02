@@ -2,16 +2,54 @@
  * Unit tests for the action's post script, src/post.ts
  */
 
-import * as main from '../src/main'
+const mockLogout = jest.fn()
+const mockGetInput = jest.fn()
+const mockDebug = jest.fn()
 
-// Mock the action's entrypoint
-const runMock = jest.spyOn(main, 'logout').mockImplementation()
+jest.mock('@actions/core', () => ({
+  getInput: mockGetInput,
+  debug: mockDebug
+}))
+
+jest.mock('../src/main', () => ({
+  logout: mockLogout
+}))
 
 describe('logout', () => {
-  it('calls run when imported', async () => {
+  beforeEach(() => {
+    jest.resetModules()
+    mockLogout.mockClear()
+    mockGetInput.mockReset()
+    mockDebug.mockClear()
+  })
+
+  it('calls logout when logout input is "true"', async () => {
+    mockGetInput.mockReturnValue('true')
+
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     require('../src/post')
 
-    expect(runMock).toHaveBeenCalled()
+    expect(mockGetInput).toHaveBeenCalledWith('logout')
+    expect(mockLogout).toHaveBeenCalled()
+  })
+
+  it('skips logout when logout input is not set', async () => {
+    mockGetInput.mockReturnValue('')
+
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('../src/post')
+
+    expect(mockGetInput).toHaveBeenCalledWith('logout')
+    expect(mockLogout).not.toHaveBeenCalled()
+  })
+
+  it('skips logout when logout input is "false"', async () => {
+    mockGetInput.mockReturnValue('false')
+
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('../src/post')
+
+    expect(mockGetInput).toHaveBeenCalledWith('logout')
+    expect(mockLogout).not.toHaveBeenCalled()
   })
 })
