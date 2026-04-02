@@ -143,13 +143,19 @@ jobs:
       - name: Verify token exists after login
         shell: bash
         run: |
-          if [ ! -d "$HOME/.omnistrate" ]; then
-            echo "::error::Expected ~/.omnistrate/ to exist"
+          CONFIG="$HOME/.omnistrate/config.yml"
+          if [ ! -f "$CONFIG" ]; then
+            echo "::error::Expected $CONFIG to exist"
             exit 1
           fi
-          echo "✓ ~/.omnistrate/ exists after login"
+          if grep -q "token:" "$CONFIG"; then
+            echo "✓ Token present in $CONFIG after login"
+          else
+            echo "::error::No token found in $CONFIG after login"
+            exit 1
+          fi
 
-      # Post step runs "omnistrate-ctl logout" because logout: true
+      # Post step runs logout + deletes ~/.omnistrate/
 
   test-action-no-logout:
     name: GitHub Actions Test No Logout
@@ -172,11 +178,19 @@ jobs:
           email: ${{ secrets.OMNISTRATE_ACCOUNT_EMAIL }}
           password: '${{ secrets.OMNISTRATE_ACCOUNT_PASSWORD }}'
 
-      - name: Verify token exists (post step skipped)
+      - name: Verify token exists before cleanup
         shell: bash
         run: |
-          if [ ! -d "$HOME/.omnistrate" ]; then
-            echo "::error::Expected ~/.omnistrate/ to exist"
+          CONFIG="$HOME/.omnistrate/config.yml"
+          if [ ! -f "$CONFIG" ]; then
+            echo "::error::Expected $CONFIG to exist"
             exit 1
           fi
-          echo "✓ ~/.omnistrate/ exists (no logout, token retained)"
+          if grep -q "token:" "$CONFIG"; then
+            echo "✓ Token present (post step will delete it)"
+          else
+            echo "::error::No token found in $CONFIG"
+            exit 1
+          fi
+
+      # Post step skips logout but still deletes ~/.omnistrate/

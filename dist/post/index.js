@@ -28317,12 +28317,14 @@ exports.install = install;
 exports.resolveUrl = resolveUrl;
 exports.login = login;
 exports.logout = logout;
+exports.cleanup = cleanup;
 const core = __importStar(__nccwpck_require__(7484));
 const exec = __importStar(__nccwpck_require__(5236));
 const toolCache = __importStar(__nccwpck_require__(3472));
 const constants_1 = __nccwpck_require__(7242);
 const fs = __importStar(__nccwpck_require__(9896));
 const path = __importStar(__nccwpck_require__(6928));
+const os = __importStar(__nccwpck_require__(857));
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
@@ -28446,6 +28448,21 @@ async function logout() {
         core.warning(`Failed to logout from Omnistrate CLI: ${error}`);
     }
 }
+async function cleanup() {
+    const configDir = path.join(os.homedir(), '.omnistrate');
+    try {
+        if (fs.existsSync(configDir)) {
+            fs.rmSync(configDir, { recursive: true });
+            core.info('Cleaned up ~/.omnistrate/ credentials');
+        }
+        else {
+            core.debug('No ~/.omnistrate/ directory to clean up');
+        }
+    }
+    catch (error) {
+        core.warning(`Failed to clean up ~/.omnistrate/: ${error}`);
+    }
+}
 
 
 /***/ }),
@@ -28494,13 +28511,17 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
  */
 const core = __importStar(__nccwpck_require__(7484));
 const main_1 = __nccwpck_require__(1730);
-const shouldLogout = core.getInput('logout').toLowerCase() === 'true';
-if (shouldLogout) {
-    (0, main_1.logout)();
+async function run() {
+    const shouldLogout = core.getInput('logout').toLowerCase() === 'true';
+    if (shouldLogout) {
+        await (0, main_1.logout)();
+    }
+    else {
+        core.debug('Skipping logout (logout input is not set to "true")');
+    }
+    await (0, main_1.cleanup)();
 }
-else {
-    core.debug('Skipping logout (logout input is not set to "true")');
-}
+run();
 
 
 /***/ }),

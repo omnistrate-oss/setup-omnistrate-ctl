@@ -3,7 +3,6 @@ import fetchMock from 'jest-fetch-mock'
 import * as exec from '@actions/exec'
 import * as toolCache from '@actions/tool-cache'
 import * as core from '@actions/core'
-// import * as fs from 'fs'
 
 fetchMock.enableMocks()
 

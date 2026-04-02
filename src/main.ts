@@ -4,6 +4,7 @@ import * as toolCache from '@actions/tool-cache'
 import { ARCHITECTURE, PLATFORM, VERSION } from './constants'
 import * as fs from 'fs'
 import * as path from 'path'
+import * as os from 'os'
 
 /**
  * The main function for the action.
@@ -155,5 +156,19 @@ export async function logout(): Promise<void> {
     core.info('Logged out of Omnistrate CLI')
   } catch (error) {
     core.warning(`Failed to logout from Omnistrate CLI: ${error}`)
+  }
+}
+
+export async function cleanup(): Promise<void> {
+  const configDir = path.join(os.homedir(), '.omnistrate')
+  try {
+    if (fs.existsSync(configDir)) {
+      fs.rmSync(configDir, { recursive: true })
+      core.info('Cleaned up ~/.omnistrate/ credentials')
+    } else {
+      core.debug('No ~/.omnistrate/ directory to clean up')
+    }
+  } catch (error) {
+    core.warning(`Failed to clean up ~/.omnistrate/: ${error}`)
   }
 }
