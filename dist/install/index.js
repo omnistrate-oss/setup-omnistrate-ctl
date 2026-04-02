@@ -28432,16 +28432,18 @@ async function login(email, password) {
 }
 async function logout() {
     try {
-        // logout of the Omnistrate CLI
-        const exitCode = await exec.exec('omnistrate-ctl logout');
+        const exitCode = await exec.exec('omnistrate-ctl', ['logout'], {
+            env: { ...process.env, NO_COLOR: '1' },
+            silent: true
+        });
         if (exitCode !== 0) {
-            console.warn('Failed to logout from Omnistrate CLI');
+            core.warning('Failed to logout from Omnistrate CLI');
             return;
         }
-        console.info('Logged out of Omnistrate CLI');
+        core.info('Logged out of Omnistrate CLI');
     }
     catch (error) {
-        console.warn('Failed to logout from Omnistrate CLI', error);
+        core.warning(`Failed to logout from Omnistrate CLI: ${error}`);
     }
 }
 

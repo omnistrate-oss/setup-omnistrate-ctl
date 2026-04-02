@@ -27,7 +27,10 @@ describe('logout', () => {
 
     await main.logout()
 
-    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl logout')
+    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl', ['logout'], {
+      env: expect.objectContaining({ NO_COLOR: '1' }),
+      silent: true
+    })
   })
 
   it('returns 1 when exec fails', async () => {
@@ -35,7 +38,10 @@ describe('logout', () => {
 
     await main.logout()
 
-    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl logout')
+    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl', ['logout'], {
+      env: expect.objectContaining({ NO_COLOR: '1' }),
+      silent: true
+    })
   })
 
   it('handles exceptions correctly', async () => {
@@ -44,7 +50,10 @@ describe('logout', () => {
 
     await main.logout()
 
-    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl logout')
+    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl', ['logout'], {
+      env: expect.objectContaining({ NO_COLOR: '1' }),
+      silent: true
+    })
   })
 })
 
