@@ -118,5 +118,79 @@ jobs:
           omnistrate-ctl --version
           omctl --help
 
-      - name: List Local Action CTL
-        run: omctl service list
+  test-action-logout:
+    name: GitHub Actions Test Logout
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v6
+
+      - name: Login with logout enabled
+        id: test-action-login
+        uses: ./
+        with:
+          email: ${{ secrets.OMNISTRATE_ACCOUNT_EMAIL }}
+          password: '${{ secrets.OMNISTRATE_ACCOUNT_PASSWORD }}'
+          logout: true
+
+      - name: Verify token exists after login
+        shell: bash
+        run: |
+          CONFIG="$HOME/.omnistrate/config.yml"
+          if [ ! -f "$CONFIG" ]; then
+            echo "::error::Expected $CONFIG to exist"
+            exit 1
+          fi
+          if grep -q "token:" "$CONFIG"; then
+            echo "✓ Token present in $CONFIG after login"
+          else
+            echo "::error::No token found in $CONFIG after login"
+            exit 1
+          fi
+
+      # Post step runs logout + deletes ~/.omnistrate/
+
+  test-action-no-logout:
+    name: GitHub Actions Test No Logout
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v6
+
+      - name: Login without logout
+        id: test-action-no-logout
+        uses: ./
+        with:
+          email: ${{ secrets.OMNISTRATE_ACCOUNT_EMAIL }}
+          password: '${{ secrets.OMNISTRATE_ACCOUNT_PASSWORD }}'
+
+      - name: Verify token exists before cleanup
+        shell: bash
+        run: |
+          CONFIG="$HOME/.omnistrate/config.yml"
+          if [ ! -f "$CONFIG" ]; then
+            echo "::error::Expected $CONFIG to exist"
+            exit 1
+          fi
+          if grep -q "token:" "$CONFIG"; then
+            echo "✓ Token present (post step will delete it)"
+          else
+            echo "::error::No token found in $CONFIG"
+            exit 1
+          fi
+
+      # Post step skips logout but still deletes ~/.omnistrate/

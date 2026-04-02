@@ -3,7 +3,6 @@ import fetchMock from 'jest-fetch-mock'
 import * as exec from '@actions/exec'
 import * as toolCache from '@actions/tool-cache'
 import * as core from '@actions/core'
-// import * as fs from 'fs'
 
 fetchMock.enableMocks()
 
@@ -27,7 +26,10 @@ describe('logout', () => {
 
     await main.logout()
 
-    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl logout')
+    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl', ['logout'], {
+      env: expect.objectContaining({ NO_COLOR: '1' }),
+      silent: true
+    })
   })
 
   it('returns 1 when exec fails', async () => {
@@ -35,7 +37,10 @@ describe('logout', () => {
 
     await main.logout()
 
-    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl logout')
+    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl', ['logout'], {
+      env: expect.objectContaining({ NO_COLOR: '1' }),
+      silent: true
+    })
   })
 
   it('handles exceptions correctly', async () => {
@@ -44,7 +49,10 @@ describe('logout', () => {
 
     await main.logout()
 
-    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl logout')
+    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl', ['logout'], {
+      env: expect.objectContaining({ NO_COLOR: '1' }),
+      silent: true
+    })
   })
 })
 

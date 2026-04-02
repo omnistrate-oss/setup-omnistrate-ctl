@@ -23,6 +23,12 @@ inputs:
       the latest version for the target platform will be installed.
     required: false
     default: 'latest'
+  logout:
+    description: |-
+      Whether to run "omnistrate-ctl logout" in the post step to remove
+      the temporary access token from the runner. Defaults to "false".
+    required: false
+    default: 'false'
 
 runs:
   using: node20

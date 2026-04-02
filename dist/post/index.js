@@ -28317,12 +28317,14 @@ exports.install = install;
 exports.resolveUrl = resolveUrl;
 exports.login = login;
 exports.logout = logout;
+exports.cleanup = cleanup;
 const core = __importStar(__nccwpck_require__(7484));
 const exec = __importStar(__nccwpck_require__(5236));
 const toolCache = __importStar(__nccwpck_require__(3472));
 const constants_1 = __nccwpck_require__(7242);
 const fs = __importStar(__nccwpck_require__(9896));
 const path = __importStar(__nccwpck_require__(6928));
+const os = __importStar(__nccwpck_require__(857));
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
@@ -28432,18 +28434,94 @@ async function login(email, password) {
 }
 async function logout() {
     try {
-        // logout of the Omnistrate CLI
-        const exitCode = await exec.exec('omnistrate-ctl logout');
+        const exitCode = await exec.exec('omnistrate-ctl', ['logout'], {
+            env: { ...process.env, NO_COLOR: '1' },
+            silent: true
+        });
         if (exitCode !== 0) {
-            console.warn('Failed to logout from Omnistrate CLI');
+            core.warning('Failed to logout from Omnistrate CLI');
             return;
         }
-        console.info('Logged out of Omnistrate CLI');
+        core.info('Logged out of Omnistrate CLI');
     }
     catch (error) {
-        console.warn('Failed to logout from Omnistrate CLI', error);
+        core.warning(`Failed to logout from Omnistrate CLI: ${error}`);
     }
 }
+async function cleanup() {
+    const configDir = path.join(os.homedir(), '.omnistrate');
+    try {
+        if (fs.existsSync(configDir)) {
+            fs.rmSync(configDir, { recursive: true });
+            core.info('Cleaned up ~/.omnistrate/ credentials');
+        }
+        else {
+            core.debug('No ~/.omnistrate/ directory to clean up');
+        }
+    }
+    catch (error) {
+        core.warning(`Failed to clean up ~/.omnistrate/: ${error}`);
+    }
+}
+
+
+/***/ }),
+
+/***/ 6661:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+/**
+ * The entrypoint for the action.
+ */
+const core = __importStar(__nccwpck_require__(7484));
+const main_1 = __nccwpck_require__(1730);
+async function run() {
+    const shouldLogout = core.getInput('logout').toLowerCase() === 'true';
+    if (shouldLogout) {
+        await (0, main_1.logout)();
+    }
+    else {
+        core.debug('Skipping logout (logout input is not set to "true")');
+        await (0, main_1.cleanup)();
+    }
+}
+run();
 
 
 /***/ }),
@@ -30359,22 +30437,13 @@ module.exports = parseParams
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
-(() => {
-"use strict";
-var exports = __webpack_exports__;
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-/**
- * The entrypoint for the action.
- */
-const main_1 = __nccwpck_require__(1730);
-(0, main_1.logout)();
-
-})();
-
-module.exports = __webpack_exports__;
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __nccwpck_require__(6661);
+/******/ 	module.exports = __webpack_exports__;
+/******/ 	
 /******/ })()
 ;
 //# sourceMappingURL=index.js.map
