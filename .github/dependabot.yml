@@ -9,8 +9,6 @@ updates:
         update-types:
           - minor
           - patch
-    cooldown:
-      default: 3
 
   - package-ecosystem: npm
     directory: /
@@ -26,5 +24,3 @@ updates:
         dependency-type: production
         update-types:
           - patch
-    cooldown:
-      default: 3

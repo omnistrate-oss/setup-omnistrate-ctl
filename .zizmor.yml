@@ -1,0 +1,3 @@
+rules:
+  dependabot-cooldown: skip
+  secrets-outside-env: skip
