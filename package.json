@@ -66,13 +66,15 @@
       "./src/**"
     ]
   },
+  "overrides": {
+    "undici": "^6.24.0"
+  },
   "dependencies": {
     "@actions/core": "^1.10.1",
     "@actions/exec": "^1.1.1",
     "@actions/github": "^9.0.0",
     "@actions/tool-cache": "^2.0.2",
-    "jest-fetch-mock": "^3.0.3",
-    "npm": "^11.11.0"
+    "jest-fetch-mock": "^3.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
@@ -90,7 +92,6 @@
     "jest": "^30.2.0",
     "make-coverage-badge": "^1.2.0",
     "prettier": "^3.8.1",
-    "prettier-eslint": "^16.4.2",
     "ts-jest": "^29.4.9",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1"
