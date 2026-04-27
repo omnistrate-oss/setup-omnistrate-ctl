@@ -30,8 +30,8 @@
     "format:write": "npx prettier --write .",
     "format:check": "npx prettier --check .",
     "lint": "npx eslint .",
-    "package-install": "npx ncc build src/install.ts -o dist/install --source-map --license licenses.txt",
-    "package-post": "npx ncc build src/post.ts -o dist/post --source-map --license licenses.txt",
+    "package-install": "npx esbuild src/install.ts --bundle --outfile=dist/install/index.js --platform=node --target=node20 --format=cjs --sourcemap",
+    "package-post": "npx esbuild src/post.ts --bundle --outfile=dist/post/index.js --platform=node --target=node20 --format=cjs --sourcemap",
     "package:watch": "npm run package -- --watch",
     "test": "npx jest",
     "all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package-install && npm run package-post"
@@ -83,7 +83,6 @@
     "@types/node": "^25.6.0",
     "@typescript-eslint/eslint-plugin": "^8.59.1",
     "@typescript-eslint/parser": "^8.59.1",
-    "@vercel/ncc": "^0.38.4",
     "esbuild": "^0.28.0",
     "eslint": "^9.39.2",
     "eslint-plugin-github": "^5.0.2",

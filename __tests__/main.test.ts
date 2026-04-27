@@ -1,3 +1,5 @@
+jest.mock('@actions/core')
+
 import * as main from '../src/main'
 import fetchMock from 'jest-fetch-mock'
 import * as exec from '@actions/exec'
