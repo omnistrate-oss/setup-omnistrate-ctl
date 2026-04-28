@@ -10,6 +10,8 @@ jest.mock('fs', () => ({
   rmSync: (...args: unknown[]) => mockRmSync(...args)
 }))
 
+jest.mock('@actions/core')
+
 import * as core from '@actions/core'
 import { cleanup } from '../src/main'
 
