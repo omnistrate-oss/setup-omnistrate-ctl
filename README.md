@@ -43,7 +43,6 @@ by default.
   uses: omnistrate-oss/setup-omnistrate-ctl@v1
   with:
     api-key: ${{ secrets.OMNISTRATE_API_KEY }}
-    logout: true
 
 - name: Test CTL command
   shell: bash
@@ -61,7 +60,6 @@ by default.
     email: ${{ secrets.OMNISTRATE_USERNAME }}
     password: ${{ secrets.OMNISTRATE_PASSWORD }}
     version: latest # OPTIONAL
-    logout: true # OPTIONAL — set to "true" to logout after the job completes
 
 # Execute and example command
 - name: Test CTL command
@@ -79,16 +77,21 @@ by default.
 
 The following inputs can be used as `step.with` keys:
 
-| Name       | Type   | Description                                          |
-| ---------- | ------ | ---------------------------------------------------- |
-| `api-key`  | String | Omnistrate API key (`om_...`). Recommended for CI/CD |
-| `email`    | String | Email to log in to Omnistrate                        |
-| `password` | String | Password to log in to Omnistrate                     |
-| `version`  | String | CTL version (default: `latest`)                      |
-| `logout`   | String | Logout after the job (default: `false`)              |
+| Name          | Type   | Description                                          |
+| ------------- | ------ | ---------------------------------------------------- |
+| `api-key`     | String | Omnistrate API key (`om_...`). Recommended for CI/CD |
+| `email`       | String | Email to log in to Omnistrate                        |
+| `password`    | String | Password to log in to Omnistrate                     |
+| `version`     | String | CTL version (default: `latest`)                      |
+| `logout`      | String | Logout after the job (default: `true`)               |
+| `skip-revoke` | String | Skip server-side token revocation (default: `false`) |
 
 > When both `api-key` and `email`/`password` are provided, `api-key` takes
 > precedence.
+
+> **Security:** By default, the post step runs `omnistrate-ctl revoke-token` to
+> invalidate the refresh token on the server before cleaning up local
+> credentials. Set `skip-revoke: true` to only remove local credentials.
 
 ## Contributing
 

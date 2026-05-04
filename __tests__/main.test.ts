@@ -17,6 +17,47 @@ let coreAddPathMock: jest.SpyInstance
 let coreSetFailed: jest.SpyInstance
 // let fsChmodSyncMock: jest.SpyInstance
 
+describe('revokeToken', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    execMock = jest.spyOn(exec, 'exec')
+  })
+
+  it('calls exec with revoke-token command', async () => {
+    execMock.mockImplementationOnce(async () => Promise.resolve(0))
+
+    await main.revokeToken()
+
+    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl', ['revoke-token'], {
+      env: expect.objectContaining({ NO_COLOR: '1' }),
+      silent: true
+    })
+  })
+
+  it('warns when exec returns non-zero', async () => {
+    execMock.mockImplementationOnce(async () => Promise.resolve(1))
+    const warningMock = jest.spyOn(core, 'warning').mockImplementation()
+
+    await main.revokeToken()
+
+    expect(warningMock).toHaveBeenCalledWith(
+      'Failed to revoke token from Omnistrate CLI'
+    )
+  })
+
+  it('handles exceptions correctly', async () => {
+    const error = new Error('Test error')
+    execMock.mockImplementationOnce(async () => Promise.reject(error))
+    const warningMock = jest.spyOn(core, 'warning').mockImplementation()
+
+    await main.revokeToken()
+
+    expect(warningMock).toHaveBeenCalledWith(
+      expect.stringContaining('Test error')
+    )
+  })
+})
+
 describe('logout', () => {
   beforeEach(() => {
     jest.clearAllMocks()

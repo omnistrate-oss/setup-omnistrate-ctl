@@ -170,6 +170,22 @@ export async function loginWithAPIKey(apiKey: string): Promise<void> {
   }
 }
 
+export async function revokeToken(): Promise<void> {
+  try {
+    const exitCode = await exec.exec('omnistrate-ctl', ['revoke-token'], {
+      env: { ...process.env, NO_COLOR: '1' },
+      silent: true
+    })
+    if (exitCode !== 0) {
+      core.warning('Failed to revoke token from Omnistrate CLI')
+      return
+    }
+    core.info('Revoked refresh token from Omnistrate CLI')
+  } catch (error) {
+    core.warning(`Failed to revoke token: ${error}`)
+  }
+}
+
 export async function logout(): Promise<void> {
   try {
     const exitCode = await exec.exec('omnistrate-ctl', ['logout'], {
