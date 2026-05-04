@@ -17,6 +17,12 @@ inputs:
   password:
     description: 'User password'
     required: false
+  api-key:
+    description: |-
+      Omnistrate API key (om_... format). When set, the action logs in
+      using the API key instead of email/password. Recommended for CI/CD.
+      Store as a GitHub Actions secret.
+    required: false
   version:
     description: |-
       Version of Omnistrate CTL to install. If unspecified or set to "latest",

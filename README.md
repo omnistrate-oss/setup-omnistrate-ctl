@@ -8,11 +8,14 @@
 
 ## About
 
-This action allows you to easily setup Omnistrate CTL command like to be able to
-create and operate Omnistrate services. It allows to setup a email and password
-to use to login to Omnistrate, we recommend storing the email and passwords as
-secrets in GitHub and reference those secrets from the Action. It also allows to
-optionally set up a version of the Omnistrate CTL command to use or uses latest
+This action allows you to easily setup Omnistrate CTL command line to be able to
+create and operate Omnistrate services. It supports two authentication methods:
+
+- **API key** (recommended for CI/CD) — pass an `api-key` input
+- **Email and password** — pass `email` and `password` inputs
+
+We recommend storing credentials as GitHub Actions secrets. It also allows you
+to optionally set a version of the Omnistrate CTL command to use or uses latest
 by default.
 
 > **Note:** By default, the action does **not** run `omnistrate-ctl logout`
@@ -33,7 +36,23 @@ by default.
 
 ## Usage
 
-- **Create secrets in your repository for your Omnistrate email and password**
+### API key authentication (recommended)
+
+```yaml
+- name: Setup Omnistrate CTL
+  uses: omnistrate-oss/setup-omnistrate-ctl@v1
+  with:
+    api-key: ${{ secrets.OMNISTRATE_API_KEY }}
+    logout: true
+
+- name: Test CTL command
+  shell: bash
+  run: |
+    omnistrate-ctl --version
+    omctl --version
+```
+
+### Email and password authentication
 
 ```yaml
 - name: Setup Omnistrate CTL
@@ -60,12 +79,16 @@ by default.
 
 The following inputs can be used as `step.with` keys:
 
-| Name       | Type   | Description                             |
-| ---------- | ------ | --------------------------------------- |
-| `email`    | String | Email to log in to Omnistrate           |
-| `password` | String | Password to log in to Omnistrate        |
-| `version`  | String | CTL version (default: `latest`)         |
-| `logout`   | String | Logout after the job (default: `false`) |
+| Name       | Type   | Description                                          |
+| ---------- | ------ | ---------------------------------------------------- |
+| `api-key`  | String | Omnistrate API key (`om_...`). Recommended for CI/CD |
+| `email`    | String | Email to log in to Omnistrate                        |
+| `password` | String | Password to log in to Omnistrate                     |
+| `version`  | String | CTL version (default: `latest`)                      |
+| `logout`   | String | Logout after the job (default: `false`)              |
+
+> When both `api-key` and `email`/`password` are provided, `api-key` takes
+> precedence.
 
 ## Contributing
 

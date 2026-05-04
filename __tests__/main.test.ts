@@ -108,6 +108,48 @@ describe('login', () => {
   })
 })
 
+const apiKey = 'om_test_key_123'
+
+describe('loginWithAPIKey', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    execMock = jest.spyOn(exec, 'exec')
+  })
+
+  it('calls exec with --api-key-stdin and passes key via input', async () => {
+    execMock.mockImplementationOnce(async () => Promise.resolve(0))
+
+    await main.loginWithAPIKey(apiKey)
+
+    expect(execMock).toHaveBeenCalledWith(
+      'omnistrate-ctl login',
+      ['--api-key-stdin'],
+      { input: Buffer.from(apiKey) }
+    )
+  })
+
+  it('sets failed when exec returns non-zero', async () => {
+    execMock.mockImplementationOnce(async () => Promise.resolve(1))
+    coreSetFailed = jest.spyOn(core, 'setFailed').mockImplementation()
+
+    await main.loginWithAPIKey(apiKey)
+
+    expect(coreSetFailed).toHaveBeenCalledWith(
+      'Failed to login to Omnistrate CLI with API key'
+    )
+  })
+
+  it('handles exceptions correctly', async () => {
+    const error = new Error('Test error')
+    execMock.mockImplementationOnce(async () => Promise.reject(error))
+    coreSetFailed = jest.spyOn(core, 'setFailed').mockImplementation()
+
+    await main.loginWithAPIKey(apiKey)
+
+    expect(coreSetFailed).toHaveBeenCalledWith('Test error')
+  })
+})
+
 describe('resolveUrl', () => {
   it('should return the correct URL for darwin arm64 latest', () => {
     const platform = 'darwin'
