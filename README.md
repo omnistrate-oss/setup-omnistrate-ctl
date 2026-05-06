@@ -45,10 +45,10 @@ email/password secrets.
 #### Obtaining an API key
 
 1. Log in to the [Omnistrate Console](https://console.omnistrate.cloud/)
-2. Navigate to **Settings → API Keys**
-3. Click **Create API Key**, give it a name and select the desired permissions
-4. Copy the generated key (starts with `om_`) — it is only shown once
-5. Store it as a GitHub Actions secret (e.g., `OMNISTRATE_API_KEY`)
+1. Navigate to **Settings → API Keys**
+1. Click **Create API Key**, give it a name and select the desired permissions
+1. Copy the generated key (starts with `om_`) — it is only shown once
+1. Store it as a GitHub Actions secret (e.g., `OMNISTRATE_API_KEY`)
 
 #### Basic usage
 
@@ -127,6 +127,8 @@ If you don't want the action to revoke the server-side token after the job
 
 The following inputs can be used as `step.with` keys:
 
+<!-- markdownlint-disable MD013 -->
+
 | Name          | Type   | Description                                                                                                   |
 | ------------- | ------ | ------------------------------------------------------------------------------------------------------------- |
 | `api-key`     | String | API key (`om_...`). Recommended for CI                                                                        |
@@ -135,6 +137,8 @@ The following inputs can be used as `step.with` keys:
 | `version`     | String | CTL version (default: `latest`)                                                                               |
 | `logout`      | String | Logout after job — revokes **all sessions on all devices** (default: `true`)                                  |
 | `skip-revoke` | String | Skip server-side token revocation — only affects the **current token**, not other sessions (default: `false`) |
+
+<!-- markdownlint-enable MD013 -->
 
 > When both `api-key` and `email`/`password` are provided, `api-key` takes
 > precedence.
