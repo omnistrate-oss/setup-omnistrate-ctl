@@ -38,6 +38,20 @@ by default.
 
 ### API key authentication (recommended)
 
+API keys are the recommended authentication method for CI/CD pipelines. They
+provide scoped, revocable credentials that don't require sharing personal
+email/password secrets.
+
+#### Obtaining an API key
+
+1. Log in to the [Omnistrate Console](https://console.omnistrate.cloud/)
+2. Navigate to **Settings → API Keys**
+3. Click **Create API Key**, give it a name and select the desired permissions
+4. Copy the generated key (starts with `om_`) — it is only shown once
+5. Store it as a GitHub Actions secret (e.g., `OMNISTRATE_API_KEY`)
+
+#### Basic usage
+
 ```yaml
 - name: Setup Omnistrate CTL
   uses: omnistrate-oss/setup-omnistrate-ctl@v1
@@ -49,6 +63,29 @@ by default.
   run: |
     omnistrate-ctl --version
     omctl --version
+```
+
+#### With token revocation disabled
+
+If you don't want the action to revoke the server-side token after the job
+(e.g., for debugging or when reusing tokens across jobs), set `skip-revoke`:
+
+```yaml
+- name: Setup Omnistrate CTL
+  uses: omnistrate-oss/setup-omnistrate-ctl@v1
+  with:
+    api-key: ${{ secrets.OMNISTRATE_API_KEY }}
+    skip-revoke: 'true'
+```
+
+#### With a specific CTL version
+
+```yaml
+- name: Setup Omnistrate CTL
+  uses: omnistrate-oss/setup-omnistrate-ctl@v1
+  with:
+    api-key: ${{ secrets.OMNISTRATE_API_KEY }}
+    version: 'v1.0.8'
 ```
 
 ### Email and password authentication
@@ -70,6 +107,18 @@ by default.
     # omctl alias is also supported
     omctl --version
 ```
+
+### Security notes
+
+- **Secrets are masked**: Both `api-key` and `password` are registered with the
+  Actions runner via `core.setSecret()`, ensuring they are redacted in all log
+  output.
+- **No CLI argument exposure**: Credentials are passed via stdin (`--password-stdin`
+  / `--api-key-stdin`), so they never appear in process lists or debug logs.
+- **Post-job cleanup**: By default the action revokes the refresh token on the
+  server and removes local credentials from the runner.
+- **Prefer API keys over email/password**: API keys can be scoped and rotated
+  independently without affecting your user account.
 
 ## Customizing
 
