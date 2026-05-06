@@ -23937,17 +23937,29 @@ async function installCtl(url, version) {
 }
 async function login(email, password) {
   try {
+    let output = "";
     const exitCode = await exec.exec(
       "omnistrate-ctl login",
       ["--email", email, "--password-stdin"],
       {
-        input: Buffer.from(password)
+        input: Buffer.from(password),
+        silent: true,
+        listeners: {
+          stdout: (data) => {
+            output += data.toString();
+          },
+          stderr: (data) => {
+            output += data.toString();
+          }
+        }
       }
     );
     if (exitCode !== 0) {
       setFailed("Failed to login to Omnistrate CLI");
+      debug(output);
       return;
     }
+    info("Logged in to Omnistrate CLI");
   } catch (error2) {
     if (error2 instanceof Error) {
       setFailed(error2.message);
@@ -23958,15 +23970,26 @@ async function login(email, password) {
 }
 async function loginWithAPIKey(apiKey) {
   try {
+    let output = "";
     const exitCode = await exec.exec(
       "omnistrate-ctl login",
       ["--api-key-stdin"],
       {
-        input: Buffer.from(apiKey)
+        input: Buffer.from(apiKey),
+        silent: true,
+        listeners: {
+          stdout: (data) => {
+            output += data.toString();
+          },
+          stderr: (data) => {
+            output += data.toString();
+          }
+        }
       }
     );
     if (exitCode !== 0) {
       setFailed("Failed to login to Omnistrate CLI with API key");
+      debug(output);
       return;
     }
     info("Logged in to Omnistrate CLI with API key");

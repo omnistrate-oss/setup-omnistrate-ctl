@@ -116,7 +116,7 @@ describe('login', () => {
     expect(execMock).toHaveBeenCalledWith(
       'omnistrate-ctl login',
       ['--email', email, '--password-stdin'],
-      { input: Buffer.from(pwd) }
+      expect.objectContaining({ input: Buffer.from(pwd), silent: true })
     )
   })
 
@@ -128,7 +128,7 @@ describe('login', () => {
     expect(execMock).toHaveBeenCalledWith(
       'omnistrate-ctl login',
       ['--email', email, '--password-stdin'],
-      { input: Buffer.from(pwd) }
+      expect.objectContaining({ input: Buffer.from(pwd), silent: true })
     )
   })
 
@@ -141,7 +141,7 @@ describe('login', () => {
     expect(execMock).toHaveBeenCalledWith(
       'omnistrate-ctl login',
       ['--email', email, '--password-stdin'],
-      { input: Buffer.from(pwd) }
+      expect.objectContaining({ input: Buffer.from(pwd), silent: true })
     )
   })
 })
@@ -162,7 +162,7 @@ describe('loginWithAPIKey', () => {
     expect(execMock).toHaveBeenCalledWith(
       'omnistrate-ctl login',
       ['--api-key-stdin'],
-      { input: Buffer.from(apiKey) }
+      expect.objectContaining({ input: Buffer.from(apiKey), silent: true })
     )
   })
 

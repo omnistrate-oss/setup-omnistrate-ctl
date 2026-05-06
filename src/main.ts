@@ -132,17 +132,25 @@ async function installCtl(url: string, version: string): Promise<void> {
 
 export async function login(email: string, password: string): Promise<void> {
   try {
+    let output = ''
     const exitCode = await exec.exec(
       'omnistrate-ctl login',
       ['--email', email, '--password-stdin'],
       {
-        input: Buffer.from(password)
+        input: Buffer.from(password),
+        silent: true,
+        listeners: {
+          stdout: (data: Buffer) => { output += data.toString() },
+          stderr: (data: Buffer) => { output += data.toString() }
+        }
       }
     )
     if (exitCode !== 0) {
       core.setFailed('Failed to login to Omnistrate CLI')
+      core.debug(output)
       return
     }
+    core.info('Logged in to Omnistrate CLI')
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
@@ -154,15 +162,22 @@ export async function login(email: string, password: string): Promise<void> {
 
 export async function loginWithAPIKey(apiKey: string): Promise<void> {
   try {
+    let output = ''
     const exitCode = await exec.exec(
       'omnistrate-ctl login',
       ['--api-key-stdin'],
       {
-        input: Buffer.from(apiKey)
+        input: Buffer.from(apiKey),
+        silent: true,
+        listeners: {
+          stdout: (data: Buffer) => { output += data.toString() },
+          stderr: (data: Buffer) => { output += data.toString() }
+        }
       }
     )
     if (exitCode !== 0) {
       core.setFailed('Failed to login to Omnistrate CLI with API key')
+      core.debug(output)
       return
     }
     core.info('Logged in to Omnistrate CLI with API key')
