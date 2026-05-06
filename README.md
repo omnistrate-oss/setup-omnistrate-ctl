@@ -113,8 +113,9 @@ If you don't want the action to revoke the server-side token after the job
 - **Secrets are masked**: Both `api-key` and `password` are registered with the
   Actions runner via `core.setSecret()`, ensuring they are redacted in all log
   output.
-- **No CLI argument exposure**: Credentials are passed via stdin (`--password-stdin`
-  / `--api-key-stdin`), so they never appear in process lists or debug logs.
+- **No CLI argument exposure**: Credentials are passed via stdin
+  (`--password-stdin` / `--api-key-stdin`), so they never appear in process
+  lists or debug logs.
 - **Post-job cleanup**: By default the action revokes the refresh token on the
   server and removes local credentials from the runner.
 - **Prefer API keys over email/password**: API keys can be scoped and rotated
@@ -126,13 +127,13 @@ If you don't want the action to revoke the server-side token after the job
 
 The following inputs can be used as `step.with` keys:
 
-| Name          | Type   | Description                                                                  |
-| ------------- | ------ | ---------------------------------------------------------------------------- |
-| `api-key`     | String | API key (`om_...`). Recommended for CI                                       |
-| `email`       | String | Email to log in to Omnistrate                                                |
-| `password`    | String | Password to log in to Omnistrate                                             |
-| `version`     | String | CTL version (default: `latest`)                                              |
-| `logout`      | String | Logout after job — revokes **all sessions on all devices** (default: `true`) |
+| Name          | Type   | Description                                                                                                   |
+| ------------- | ------ | ------------------------------------------------------------------------------------------------------------- |
+| `api-key`     | String | API key (`om_...`). Recommended for CI                                                                        |
+| `email`       | String | Email to log in to Omnistrate                                                                                 |
+| `password`    | String | Password to log in to Omnistrate                                                                              |
+| `version`     | String | CTL version (default: `latest`)                                                                               |
+| `logout`      | String | Logout after job — revokes **all sessions on all devices** (default: `true`)                                  |
 | `skip-revoke` | String | Skip server-side token revocation — only affects the **current token**, not other sessions (default: `false`) |
 
 > When both `api-key` and `email`/`password` are provided, `api-key` takes

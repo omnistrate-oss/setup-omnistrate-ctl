@@ -140,8 +140,12 @@ export async function login(email: string, password: string): Promise<void> {
         input: Buffer.from(password),
         silent: true,
         listeners: {
-          stdout: (data: Buffer) => { output += data.toString() },
-          stderr: (data: Buffer) => { output += data.toString() }
+          stdout: (data: Buffer) => {
+            output += data.toString()
+          },
+          stderr: (data: Buffer) => {
+            output += data.toString()
+          }
         }
       }
     )
@@ -170,8 +174,12 @@ export async function loginWithAPIKey(apiKey: string): Promise<void> {
         input: Buffer.from(apiKey),
         silent: true,
         listeners: {
-          stdout: (data: Buffer) => { output += data.toString() },
-          stderr: (data: Buffer) => { output += data.toString() }
+          stdout: (data: Buffer) => {
+            output += data.toString()
+          },
+          stderr: (data: Buffer) => {
+            output += data.toString()
+          }
         }
       }
     )
