@@ -23759,6 +23759,9 @@ var ExitCode;
   ExitCode2[ExitCode2["Success"] = 0] = "Success";
   ExitCode2[ExitCode2["Failure"] = 1] = "Failure";
 })(ExitCode || (ExitCode = {}));
+function setSecret(secret) {
+  issueCommand("add-mask", {}, secret);
+}
 function addPath(inputPath) {
   const filePath = process.env["GITHUB_PATH"] || "";
   if (filePath) {
@@ -23852,10 +23855,15 @@ async function install() {
     } else {
       await installCtl(url, VERSION);
     }
+    const apiKey = getInput("api-key");
     const email = getInput("email");
     const password = getInput("password");
-    if (email && password) {
-      login(email, password);
+    if (apiKey) setSecret(apiKey);
+    if (password) setSecret(password);
+    if (apiKey) {
+      await loginWithAPIKey(apiKey);
+    } else if (email && password) {
+      await login(email, password);
     }
   } catch (error2) {
     if (error2 instanceof Error) {
@@ -23929,16 +23937,62 @@ async function installCtl(url, version) {
 }
 async function login(email, password) {
   try {
-    const exitCode = await exec.exec("omnistrate-ctl login", [
-      "--email",
-      email,
-      "--password",
-      password
-    ]);
+    let output = "";
+    const exitCode = await exec.exec(
+      "omnistrate-ctl login",
+      ["--email", email, "--password-stdin"],
+      {
+        input: Buffer.from(password),
+        silent: true,
+        listeners: {
+          stdout: (data) => {
+            output += data.toString();
+          },
+          stderr: (data) => {
+            output += data.toString();
+          }
+        }
+      }
+    );
     if (exitCode !== 0) {
       setFailed("Failed to login to Omnistrate CLI");
+      debug(output);
       return;
     }
+    info("Logged in to Omnistrate CLI");
+  } catch (error2) {
+    if (error2 instanceof Error) {
+      setFailed(error2.message);
+    } else {
+      setFailed(`${error2}`);
+    }
+  }
+}
+async function loginWithAPIKey(apiKey) {
+  try {
+    let output = "";
+    const exitCode = await exec.exec(
+      "omnistrate-ctl login",
+      ["--api-key-stdin"],
+      {
+        input: Buffer.from(apiKey),
+        silent: true,
+        listeners: {
+          stdout: (data) => {
+            output += data.toString();
+          },
+          stderr: (data) => {
+            output += data.toString();
+          }
+        }
+      }
+    );
+    if (exitCode !== 0) {
+      setFailed("Failed to login to Omnistrate CLI with API key");
+      debug(output);
+      return;
+    }
+    info("Logged in to Omnistrate CLI with API key");
   } catch (error2) {
     if (error2 instanceof Error) {
       setFailed(error2.message);

@@ -17,6 +17,47 @@ let coreAddPathMock: jest.SpyInstance
 let coreSetFailed: jest.SpyInstance
 // let fsChmodSyncMock: jest.SpyInstance
 
+describe('revokeToken', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    execMock = jest.spyOn(exec, 'exec')
+  })
+
+  it('calls exec with revoke-token command', async () => {
+    execMock.mockImplementationOnce(async () => Promise.resolve(0))
+
+    await main.revokeToken()
+
+    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl', ['revoke-token'], {
+      env: expect.objectContaining({ NO_COLOR: '1' }),
+      silent: true
+    })
+  })
+
+  it('warns when exec returns non-zero', async () => {
+    execMock.mockImplementationOnce(async () => Promise.resolve(1))
+    const warningMock = jest.spyOn(core, 'warning').mockImplementation()
+
+    await main.revokeToken()
+
+    expect(warningMock).toHaveBeenCalledWith(
+      'Failed to revoke token from Omnistrate CLI'
+    )
+  })
+
+  it('handles exceptions correctly', async () => {
+    const error = new Error('Test error')
+    execMock.mockImplementationOnce(async () => Promise.reject(error))
+    const warningMock = jest.spyOn(core, 'warning').mockImplementation()
+
+    await main.revokeToken()
+
+    expect(warningMock).toHaveBeenCalledWith(
+      expect.stringContaining('Test error')
+    )
+  })
+})
+
 describe('logout', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -72,12 +113,11 @@ describe('login', () => {
 
     await main.login(email, pwd)
 
-    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl login', [
-      '--email',
-      email,
-      '--password',
-      pwd
-    ])
+    expect(execMock).toHaveBeenCalledWith(
+      'omnistrate-ctl login',
+      ['--email', email, '--password-stdin'],
+      expect.objectContaining({ input: Buffer.from(pwd), silent: true })
+    )
   })
 
   it('returns 1 when exec fails', async () => {
@@ -85,12 +125,11 @@ describe('login', () => {
 
     await main.login(email, pwd)
 
-    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl login', [
-      '--email',
-      email,
-      '--password',
-      pwd
-    ])
+    expect(execMock).toHaveBeenCalledWith(
+      'omnistrate-ctl login',
+      ['--email', email, '--password-stdin'],
+      expect.objectContaining({ input: Buffer.from(pwd), silent: true })
+    )
   })
 
   it('handles exceptions correctly', async () => {
@@ -99,12 +138,53 @@ describe('login', () => {
 
     await main.login(email, pwd)
 
-    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl login', [
-      '--email',
-      email,
-      '--password',
-      pwd
-    ])
+    expect(execMock).toHaveBeenCalledWith(
+      'omnistrate-ctl login',
+      ['--email', email, '--password-stdin'],
+      expect.objectContaining({ input: Buffer.from(pwd), silent: true })
+    )
+  })
+})
+
+const apiKey = 'om_test_key_123'
+
+describe('loginWithAPIKey', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    execMock = jest.spyOn(exec, 'exec')
+  })
+
+  it('calls exec with --api-key-stdin and passes key via input', async () => {
+    execMock.mockImplementationOnce(async () => Promise.resolve(0))
+
+    await main.loginWithAPIKey(apiKey)
+
+    expect(execMock).toHaveBeenCalledWith(
+      'omnistrate-ctl login',
+      ['--api-key-stdin'],
+      expect.objectContaining({ input: Buffer.from(apiKey), silent: true })
+    )
+  })
+
+  it('sets failed when exec returns non-zero', async () => {
+    execMock.mockImplementationOnce(async () => Promise.resolve(1))
+    coreSetFailed = jest.spyOn(core, 'setFailed').mockImplementation()
+
+    await main.loginWithAPIKey(apiKey)
+
+    expect(coreSetFailed).toHaveBeenCalledWith(
+      'Failed to login to Omnistrate CLI with API key'
+    )
+  })
+
+  it('handles exceptions correctly', async () => {
+    const error = new Error('Test error')
+    execMock.mockImplementationOnce(async () => Promise.reject(error))
+    coreSetFailed = jest.spyOn(core, 'setFailed').mockImplementation()
+
+    await main.loginWithAPIKey(apiKey)
+
+    expect(coreSetFailed).toHaveBeenCalledWith('Test error')
   })
 })
 

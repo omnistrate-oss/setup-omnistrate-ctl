@@ -26,11 +26,19 @@ export async function install(): Promise<void> {
       await installCtl(url, VERSION)
     }
 
-    // Login to the Omnistrate CLI with the provided credentials
+    // Login to the Omnistrate CLI
+    const apiKey = core.getInput('api-key')
     const email = core.getInput('email')
     const password = core.getInput('password')
-    if (email && password) {
-      login(email, password)
+
+    // Register secrets so the runner masks them in all log output
+    if (apiKey) core.setSecret(apiKey)
+    if (password) core.setSecret(password)
+
+    if (apiKey) {
+      await loginWithAPIKey(apiKey)
+    } else if (email && password) {
+      await login(email, password)
     }
   } catch (error) {
     if (error instanceof Error) {
@@ -124,22 +132,85 @@ async function installCtl(url: string, version: string): Promise<void> {
 
 export async function login(email: string, password: string): Promise<void> {
   try {
-    const exitCode = await exec.exec('omnistrate-ctl login', [
-      '--email',
-      email,
-      '--password',
-      password
-    ])
+    let output = ''
+    const exitCode = await exec.exec(
+      'omnistrate-ctl login',
+      ['--email', email, '--password-stdin'],
+      {
+        input: Buffer.from(password),
+        silent: true,
+        listeners: {
+          stdout: (data: Buffer) => {
+            output += data.toString()
+          },
+          stderr: (data: Buffer) => {
+            output += data.toString()
+          }
+        }
+      }
+    )
     if (exitCode !== 0) {
       core.setFailed('Failed to login to Omnistrate CLI')
+      core.debug(output)
       return
     }
+    core.info('Logged in to Omnistrate CLI')
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
     } else {
       core.setFailed(`${error}`)
     }
+  }
+}
+
+export async function loginWithAPIKey(apiKey: string): Promise<void> {
+  try {
+    let output = ''
+    const exitCode = await exec.exec(
+      'omnistrate-ctl login',
+      ['--api-key-stdin'],
+      {
+        input: Buffer.from(apiKey),
+        silent: true,
+        listeners: {
+          stdout: (data: Buffer) => {
+            output += data.toString()
+          },
+          stderr: (data: Buffer) => {
+            output += data.toString()
+          }
+        }
+      }
+    )
+    if (exitCode !== 0) {
+      core.setFailed('Failed to login to Omnistrate CLI with API key')
+      core.debug(output)
+      return
+    }
+    core.info('Logged in to Omnistrate CLI with API key')
+  } catch (error) {
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    } else {
+      core.setFailed(`${error}`)
+    }
+  }
+}
+
+export async function revokeToken(): Promise<void> {
+  try {
+    const exitCode = await exec.exec('omnistrate-ctl', ['revoke-token'], {
+      env: { ...process.env, NO_COLOR: '1' },
+      silent: true
+    })
+    if (exitCode !== 0) {
+      core.warning('Failed to revoke token from Omnistrate CLI')
+      return
+    }
+    core.info('Revoked refresh token from Omnistrate CLI')
+  } catch (error) {
+    core.warning(`Failed to revoke token: ${error}`)
   }
 }
 

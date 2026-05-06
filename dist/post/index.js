@@ -23811,6 +23811,21 @@ function getPlatform(platform2) {
 var fs2 = __toESM(require("fs"));
 var path = __toESM(require("path"));
 var os4 = __toESM(require("os"));
+async function revokeToken() {
+  try {
+    const exitCode = await exec.exec("omnistrate-ctl", ["revoke-token"], {
+      env: { ...process.env, NO_COLOR: "1" },
+      silent: true
+    });
+    if (exitCode !== 0) {
+      warning("Failed to revoke token from Omnistrate CLI");
+      return;
+    }
+    info("Revoked refresh token from Omnistrate CLI");
+  } catch (error) {
+    warning(`Failed to revoke token: ${error}`);
+  }
+}
 async function logout() {
   try {
     const exitCode = await exec.exec("omnistrate-ctl", ["logout"], {
@@ -23843,7 +23858,15 @@ async function cleanup() {
 // src/post.ts
 async function run() {
   const shouldLogout = getInput("logout").toLowerCase() === "true";
+  const shouldSkipRevoke = getInput("skip-revoke").toLowerCase() === "true";
   if (shouldLogout) {
+    if (!shouldSkipRevoke) {
+      try {
+        await revokeToken();
+      } catch (error) {
+        warning(`Revoke token failed (non-fatal): ${error}`);
+      }
+    }
     await logout();
   } else {
     debug('Skipping logout (logout input is not set to "true")');

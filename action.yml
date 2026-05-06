@@ -17,6 +17,12 @@ inputs:
   password:
     description: 'User password'
     required: false
+  api-key:
+    description: |-
+      Omnistrate API key (om_... format). When set, the action logs in
+      using the API key instead of email/password. Recommended for CI/CD.
+      Store as a GitHub Actions secret.
+    required: false
   version:
     description: |-
       Version of Omnistrate CTL to install. If unspecified or set to "latest",
@@ -26,7 +32,15 @@ inputs:
   logout:
     description: |-
       Whether to run "omnistrate-ctl logout" in the post step to remove
-      the temporary access token from the runner. Defaults to "false".
+      the temporary access token from the runner. Defaults to "true".
+    required: false
+    default: 'true'
+  skip-revoke:
+    description: |-
+      Skip server-side token revocation in the post step. When "false"
+      (the default), the action runs "omnistrate-ctl revoke-token" to
+      invalidate the refresh token on the server before cleaning up.
+      Set to "true" to only remove local credentials without revoking.
     required: false
     default: 'false'
 
