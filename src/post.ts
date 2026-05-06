@@ -10,7 +10,11 @@ async function run(): Promise<void> {
 
   if (shouldLogout) {
     if (!shouldSkipRevoke) {
-      await revokeToken()
+      try {
+        await revokeToken()
+      } catch (error) {
+        core.warning(`Revoke token failed (non-fatal): ${error}`)
+      }
     }
     await logout()
   } else {
