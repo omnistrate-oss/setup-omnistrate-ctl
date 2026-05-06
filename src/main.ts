@@ -31,6 +31,10 @@ export async function install(): Promise<void> {
     const email = core.getInput('email')
     const password = core.getInput('password')
 
+    // Register secrets so the runner masks them in all log output
+    if (apiKey) core.setSecret(apiKey)
+    if (password) core.setSecret(password)
+
     if (apiKey) {
       await loginWithAPIKey(apiKey)
     } else if (email && password) {
@@ -128,12 +132,13 @@ async function installCtl(url: string, version: string): Promise<void> {
 
 export async function login(email: string, password: string): Promise<void> {
   try {
-    const exitCode = await exec.exec('omnistrate-ctl login', [
-      '--email',
-      email,
-      '--password',
-      password
-    ])
+    const exitCode = await exec.exec(
+      'omnistrate-ctl login',
+      ['--email', email, '--password-stdin'],
+      {
+        input: Buffer.from(password)
+      }
+    )
     if (exitCode !== 0) {
       core.setFailed('Failed to login to Omnistrate CLI')
       return

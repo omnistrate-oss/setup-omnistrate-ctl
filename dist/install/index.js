@@ -23759,6 +23759,9 @@ var ExitCode;
   ExitCode2[ExitCode2["Success"] = 0] = "Success";
   ExitCode2[ExitCode2["Failure"] = 1] = "Failure";
 })(ExitCode || (ExitCode = {}));
+function setSecret(secret) {
+  issueCommand("add-mask", {}, secret);
+}
 function addPath(inputPath) {
   const filePath = process.env["GITHUB_PATH"] || "";
   if (filePath) {
@@ -23855,6 +23858,8 @@ async function install() {
     const apiKey = getInput("api-key");
     const email = getInput("email");
     const password = getInput("password");
+    if (apiKey) setSecret(apiKey);
+    if (password) setSecret(password);
     if (apiKey) {
       await loginWithAPIKey(apiKey);
     } else if (email && password) {
@@ -23932,12 +23937,13 @@ async function installCtl(url, version) {
 }
 async function login(email, password) {
   try {
-    const exitCode = await exec.exec("omnistrate-ctl login", [
-      "--email",
-      email,
-      "--password",
-      password
-    ]);
+    const exitCode = await exec.exec(
+      "omnistrate-ctl login",
+      ["--email", email, "--password-stdin"],
+      {
+        input: Buffer.from(password)
+      }
+    );
     if (exitCode !== 0) {
       setFailed("Failed to login to Omnistrate CLI");
       return;

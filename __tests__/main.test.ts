@@ -113,12 +113,11 @@ describe('login', () => {
 
     await main.login(email, pwd)
 
-    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl login', [
-      '--email',
-      email,
-      '--password',
-      pwd
-    ])
+    expect(execMock).toHaveBeenCalledWith(
+      'omnistrate-ctl login',
+      ['--email', email, '--password-stdin'],
+      { input: Buffer.from(pwd) }
+    )
   })
 
   it('returns 1 when exec fails', async () => {
@@ -126,12 +125,11 @@ describe('login', () => {
 
     await main.login(email, pwd)
 
-    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl login', [
-      '--email',
-      email,
-      '--password',
-      pwd
-    ])
+    expect(execMock).toHaveBeenCalledWith(
+      'omnistrate-ctl login',
+      ['--email', email, '--password-stdin'],
+      { input: Buffer.from(pwd) }
+    )
   })
 
   it('handles exceptions correctly', async () => {
@@ -140,12 +138,11 @@ describe('login', () => {
 
     await main.login(email, pwd)
 
-    expect(execMock).toHaveBeenCalledWith('omnistrate-ctl login', [
-      '--email',
-      email,
-      '--password',
-      pwd
-    ])
+    expect(execMock).toHaveBeenCalledWith(
+      'omnistrate-ctl login',
+      ['--email', email, '--password-stdin'],
+      { input: Buffer.from(pwd) }
+    )
   })
 })
 
