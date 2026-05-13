@@ -3,7 +3,7 @@
 [![GitHub Super-Linter](https://github.com/omnistrate-oss/setup-omnistrate-ctl/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
 ![CI](https://github.com/omnistrate-oss/setup-omnistrate-ctl/actions/workflows/ci.yml/badge.svg)
 [![Check dist/](https://github.com/omnistrate-oss/setup-omnistrate-ctl/actions/workflows/check-dist.yml/badge.svg)](https://github.com/actions/setup-omnistrate-ctl/actions/workflows/check-dist.yml)
-[![CodeQL](https://github.com/omnistrate-oss/setup-omnistrate-ctl/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/omnistrate-oss/setup-omnistrate-ctl/actions/workflows/codeql-analysis.yml)
+[![CodeQL](https://github.com/omnistrate-oss/setup-omnistrate-ctl/actions/workflows/codeql.yml/badge.svg)](https://github.com/omnistrate-oss/setup-omnistrate-ctl/actions/workflows/codeql.yml)
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
 
 ## About
