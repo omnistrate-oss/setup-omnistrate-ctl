@@ -21,7 +21,7 @@
     ".": "./dist/index.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "scripts": {
     "bundle": "npm run format:write && npm run package-install && npm run package-post",
@@ -30,8 +30,8 @@
     "format:write": "npx prettier --write .",
     "format:check": "npx prettier --check .",
     "lint": "npx eslint .",
-    "package-install": "npx esbuild src/install.ts --bundle --outfile=dist/install/index.js --platform=node --target=node20 --format=cjs --sourcemap",
-    "package-post": "npx esbuild src/post.ts --bundle --outfile=dist/post/index.js --platform=node --target=node20 --format=cjs --sourcemap",
+    "package-install": "npx esbuild src/install.ts --bundle --outfile=dist/install/index.js --platform=node --target=node24 --format=cjs --sourcemap",
+    "package-post": "npx esbuild src/post.ts --bundle --outfile=dist/post/index.js --platform=node --target=node24 --format=cjs --sourcemap",
     "package:watch": "npm run package -- --watch",
     "test": "npx jest",
     "all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package-install && npm run package-post"
@@ -67,7 +67,7 @@
     ]
   },
   "overrides": {
-    "undici": "^6.24.0"
+    "undici": "^6.27.0"
   },
   "dependencies": {
     "@actions/core": "^3.0.1",
