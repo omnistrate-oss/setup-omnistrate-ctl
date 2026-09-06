@@ -67,7 +67,7 @@
     ]
   },
   "overrides": {
-    "undici": "^6.27.0"
+    "undici": "^6.28.1"
   },
   "dependencies": {
     "@actions/core": "^3.0.1",
