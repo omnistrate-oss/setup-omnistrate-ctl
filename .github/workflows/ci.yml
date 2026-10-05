@@ -64,7 +64,7 @@ jobs:
 
       - name: Test Local Action
         id: test-action
-        uses: ./
+        uses: $/
 
       - name: Test Local Action CTL
         run: |
@@ -89,7 +89,7 @@ jobs:
 
       - name: Test Local Action with Version
         id: test-action-with-latest
-        uses: ./
+        uses: $/
         with:
           version: v0.13.28
 
@@ -116,7 +116,7 @@ jobs:
 
       - name: Test Local Action with Email and Password
         id: test-action-with-email-and-password
-        uses: ./
+        uses: $/
         with:
           email: ${{ secrets.OMNISTRATE_ACCOUNT_EMAIL }}
           password: '${{ secrets.OMNISTRATE_ACCOUNT_PASSWORD }}'
@@ -144,7 +144,7 @@ jobs:
 
       - name: Login with logout enabled
         id: test-action-login
-        uses: ./
+        uses: $/
         with:
           email: ${{ secrets.OMNISTRATE_ACCOUNT_EMAIL }}
           password: '${{ secrets.OMNISTRATE_ACCOUNT_PASSWORD }}'
@@ -185,7 +185,7 @@ jobs:
 
       - name: Login without logout
         id: test-action-no-logout
-        uses: ./
+        uses: $/
         with:
           email: ${{ secrets.OMNISTRATE_ACCOUNT_EMAIL }}
           password: '${{ secrets.OMNISTRATE_ACCOUNT_PASSWORD }}'
