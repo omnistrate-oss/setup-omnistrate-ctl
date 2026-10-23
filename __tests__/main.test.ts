@@ -1,21 +1,24 @@
 jest.mock('@actions/core')
+jest.mock('@actions/cache')
 
 import * as main from '../src/main'
+import * as constants from '../src/constants'
 import fetchMock from 'jest-fetch-mock'
 import * as exec from '@actions/exec'
+import * as cache from '@actions/cache'
 import * as toolCache from '@actions/tool-cache'
 import * as core from '@actions/core'
+import * as fs from 'fs'
+import * as os from 'os'
+import * as path from 'path'
 
 fetchMock.enableMocks()
 
 // Mock the GitHub Actions core library
 let execMock: jest.SpyInstance
-let toolCacheFindMock: jest.SpyInstance
-//let toolCacheCacheFileMock: jest.SpyInstance
 let toolCacheDownloadToolMock: jest.SpyInstance
 let coreAddPathMock: jest.SpyInstance
 let coreSetFailed: jest.SpyInstance
-// let fsChmodSyncMock: jest.SpyInstance
 
 describe('revokeToken', () => {
   beforeEach(() => {
@@ -212,31 +215,156 @@ describe('resolveUrl', () => {
   })
 })
 
-describe('install', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    execMock = jest.spyOn(exec, 'exec')
-    toolCacheFindMock = jest.spyOn(toolCache, 'find')
-    toolCacheDownloadToolMock = jest.spyOn(toolCache, 'downloadTool')
-    coreAddPathMock = jest.spyOn(core, 'addPath')
-    coreSetFailed = jest.spyOn(core, 'setFailed')
+describe('cache configuration', () => {
+  it('enables cache by default', () => {
+    expect(main.isCacheEnabled('')).toBe(true)
   })
 
-  it('should install the tool', async () => {
-    const version = 'latest'
-    const downloadPath = '/path/downloaded'
+  it('allows cache to be disabled', () => {
+    expect(main.isCacheEnabled('false')).toBe(false)
+    expect(main.isCacheEnabled('FALSE')).toBe(false)
+  })
 
-    toolCacheFindMock.mockImplementation(() => '')
-    toolCacheDownloadToolMock.mockImplementation(async () =>
-      Promise.resolve(downloadPath)
+  it('creates platform, architecture, and version-specific keys', () => {
+    const key = main.getCacheKey('linux', 'amd64', 'v1.2.3')
+
+    expect(key).toMatch(/^setup-omnistrate-ctl-v1-linux-amd64-v1\.2\.3-/)
+    expect(key).not.toBe(main.getCacheKey('linux', 'amd64', 'v1.2.4'))
+  })
+})
+
+describe('resolveLatestRelease', () => {
+  beforeEach(() => {
+    fetchMock.resetMocks()
+  })
+
+  it('resolves latest to an immutable release version and URL', async () => {
+    const location =
+      'https://github.com/omnistrate-oss/omnistrate-ctl/releases/download/v1.2.3/omnistrate-ctl-linux-amd64.tar.gz'
+    fetchMock.mockResponseOnce('', {
+      status: 302,
+      headers: { location }
+    })
+
+    await expect(
+      main.resolveLatestRelease(
+        'https://github.com/omnistrate-oss/omnistrate-ctl/releases/latest/download/omnistrate-ctl-linux-amd64.tar.gz'
+      )
+    ).resolves.toEqual({ version: 'v1.2.3', url: location })
+  })
+
+  it('returns undefined when the release redirect is unavailable', async () => {
+    fetchMock.mockResponseOnce('', { status: 200 })
+
+    await expect(
+      main.resolveLatestRelease('https://example.com/latest')
+    ).resolves.toBeUndefined()
+  })
+})
+
+describe('install', () => {
+  let tempDirectory: string
+  let extractedDirectory: string
+  let originalRunnerTemp: string | undefined
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    fetchMock.resetMocks()
+    originalRunnerTemp = process.env.RUNNER_TEMP
+    tempDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'setup-ctl-test-'))
+    extractedDirectory = path.join(tempDirectory, 'extracted')
+    fs.mkdirSync(extractedDirectory, { recursive: true })
+    process.env.RUNNER_TEMP = tempDirectory
+
+    execMock = jest.spyOn(exec, 'exec')
+    toolCacheDownloadToolMock = jest.spyOn(toolCache, 'downloadTool')
+    jest.spyOn(toolCache, 'extractTar').mockResolvedValue(extractedDirectory)
+    coreAddPathMock = jest.spyOn(core, 'addPath')
+    coreSetFailed = jest.spyOn(core, 'setFailed')
+    jest.spyOn(core, 'getInput').mockImplementation((name: string) => {
+      if (name === 'version') return 'v1.2.3'
+      if (name === 'cache') return 'true'
+      return ''
+    })
+    jest.spyOn(cache, 'restoreCache').mockResolvedValue(undefined)
+    jest.spyOn(cache, 'saveCache').mockResolvedValue(1)
+    toolCacheDownloadToolMock.mockResolvedValue(
+      path.join(tempDirectory, 'downloaded.tar.gz')
+    )
+    fs.writeFileSync(
+      path.join(
+        extractedDirectory,
+        `omnistrate-ctl-${constants.PLATFORM}-${constants.ARCHITECTURE}`
+      ),
+      'binary'
+    )
+  })
+
+  afterEach(() => {
+    if (originalRunnerTemp === undefined) {
+      delete process.env.RUNNER_TEMP
+    } else {
+      process.env.RUNNER_TEMP = originalRunnerTemp
+    }
+    fs.rmSync(tempDirectory, { recursive: true, force: true })
+  })
+
+  it('downloads and saves the tool when the cache misses', async () => {
+    await main.install()
+
+    const installDirectory = main.getInstallDirectory('v1.2.3')
+    const cacheKey = main.getCacheKey(
+      constants.PLATFORM,
+      constants.ARCHITECTURE,
+      'v1.2.3'
     )
 
-    main.install()
-
-    expect(toolCacheFindMock).toHaveBeenCalledWith('omnistrate-ctl', version)
-    expect(toolCacheFindMock).toHaveBeenCalledWith('omctl', version)
-    expect(coreAddPathMock).not.toHaveBeenCalledWith('')
+    expect(cache.restoreCache).toHaveBeenCalledWith(
+      [installDirectory],
+      cacheKey
+    )
     expect(toolCacheDownloadToolMock).toHaveBeenCalledTimes(1)
+    expect(cache.saveCache).toHaveBeenCalledWith([installDirectory], cacheKey)
+    expect(
+      fs.readFileSync(path.join(installDirectory, 'omnistrate-ctl'), 'utf8')
+    ).toBe('binary')
+    expect(fs.readFileSync(path.join(installDirectory, 'omctl'), 'utf8')).toBe(
+      'binary'
+    )
+    expect(coreAddPathMock).toHaveBeenCalledWith(installDirectory)
     expect(coreSetFailed).not.toHaveBeenCalled()
+  })
+
+  it('uses the restored binaries without downloading', async () => {
+    jest
+      .spyOn(cache, 'restoreCache')
+      .mockImplementation(async (paths: string[], key: string) => {
+        fs.mkdirSync(paths[0], { recursive: true })
+        fs.writeFileSync(path.join(paths[0], 'omnistrate-ctl'), 'cached')
+        fs.writeFileSync(path.join(paths[0], 'omctl'), 'cached')
+        return key
+      })
+
+    await main.install()
+
+    expect(toolCacheDownloadToolMock).not.toHaveBeenCalled()
+    expect(cache.saveCache).not.toHaveBeenCalled()
+    expect(coreAddPathMock).toHaveBeenCalledWith(
+      main.getInstallDirectory('v1.2.3')
+    )
+  })
+
+  it('downloads without restoring or saving when cache is disabled', async () => {
+    jest.spyOn(core, 'getInput').mockImplementation((name: string) => {
+      if (name === 'version') return 'v1.2.3'
+      if (name === 'cache') return 'false'
+      return ''
+    })
+
+    await main.install()
+
+    expect(cache.restoreCache).not.toHaveBeenCalled()
+    expect(cache.saveCache).not.toHaveBeenCalled()
+    expect(toolCacheDownloadToolMock).toHaveBeenCalledTimes(1)
   })
 })

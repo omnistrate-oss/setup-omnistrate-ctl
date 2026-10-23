@@ -1,10 +1,19 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
+import * as cache from '@actions/cache'
 import * as toolCache from '@actions/tool-cache'
-import { ARCHITECTURE, PLATFORM, VERSION } from './constants'
+import { ARCHITECTURE, PLATFORM, getVersion } from './constants'
+import { createHash } from 'crypto'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
+
+const CACHE_KEY_VERSION = 'v1'
+
+interface ResolvedRelease {
+  version: string
+  url: string
+}
 
 /**
  * The main function for the action.
@@ -12,19 +21,50 @@ import * as os from 'os'
  */
 export async function install(): Promise<void> {
   try {
-    // Resolve the url for the requested version
-    const url = resolveUrl(PLATFORM, ARCHITECTURE, VERSION)
-    core.debug(`Resolved url: ${url}`)
-    // Install the resolved version if necessary
-    const toolPath = toolCache.find('omnistrate-ctl', VERSION)
-    const toolPath2 = toolCache.find('omctl', VERSION)
-    if (VERSION !== 'latest' && toolPath && toolPath2) {
-      // use cache
-      core.addPath(toolPath)
-      core.addPath(toolPath2)
-    } else {
-      await installCtl(url, VERSION)
+    const requestedVersion = getVersion()
+    let cacheEnabled = isCacheEnabled()
+    let release: ResolvedRelease = {
+      version: requestedVersion,
+      url: resolveUrl(PLATFORM, ARCHITECTURE, requestedVersion)
     }
+
+    if (cacheEnabled && requestedVersion === 'latest') {
+      const latestRelease = await resolveLatestRelease(release.url)
+      if (latestRelease) {
+        release = latestRelease
+      } else {
+        cacheEnabled = false
+        core.warning(
+          'Could not resolve the latest CTL version; skipping the cache for this run'
+        )
+      }
+    }
+
+    const url = release.url
+    core.debug(`Resolved url: ${url}`)
+
+    const installDirectory = getInstallDirectory(release.version)
+    const cacheKey = getCacheKey(PLATFORM, ARCHITECTURE, release.version)
+    let restored = false
+
+    if (cacheEnabled) {
+      restored = await restoreCtlCache(installDirectory, cacheKey)
+    }
+
+    if (restored && hasInstalledBinaries(installDirectory)) {
+      core.info(`Restored omnistrate-ctl:${release.version} from cache`)
+    } else {
+      if (restored) {
+        core.warning('The restored CTL cache was incomplete; downloading again')
+      }
+      await installCtl(url, requestedVersion, installDirectory)
+      if (cacheEnabled) {
+        await saveCtlCache(installDirectory, cacheKey, release.version)
+      }
+    }
+
+    core.addPath(installDirectory)
+    core.debug('Added omnistrate-ctl and omctl to the path')
 
     // Login to the Omnistrate CLI
     const apiKey = core.getInput('api-key')
@@ -49,6 +89,96 @@ export async function install(): Promise<void> {
   }
 }
 
+export function isCacheEnabled(value = core.getInput('cache')): boolean {
+  return value.trim().toLowerCase() !== 'false'
+}
+
+export function getCacheKey(
+  platform: string,
+  architecture: string,
+  version: string
+): string {
+  const versionHash = createHash('sha256')
+    .update(version)
+    .digest('hex')
+    .slice(0, 12)
+  const versionLabel = version.replace(/[^a-zA-Z0-9._-]/g, '-').slice(0, 64)
+  return `setup-omnistrate-ctl-${CACHE_KEY_VERSION}-${platform}-${architecture}-${versionLabel}-${versionHash}`
+}
+
+export function getInstallDirectory(version: string): string {
+  const root = process.env.RUNNER_TEMP || os.tmpdir()
+  const versionHash = createHash('sha256')
+    .update(version)
+    .digest('hex')
+    .slice(0, 12)
+  return path.join(
+    root,
+    'setup-omnistrate-ctl',
+    `${PLATFORM}-${ARCHITECTURE}-${versionHash}`
+  )
+}
+
+export async function resolveLatestRelease(
+  latestUrl: string
+): Promise<ResolvedRelease | undefined> {
+  try {
+    const response = await fetch(latestUrl, {
+      method: 'HEAD',
+      redirect: 'manual'
+    })
+    const location = response.headers.get('location')
+    const match = location?.match(/\/releases\/download\/([^/]+)\//)
+
+    if (!location || !match) {
+      core.debug(`Latest release redirect was not returned for ${latestUrl}`)
+      return undefined
+    }
+
+    return {
+      version: decodeURIComponent(match[1]),
+      url: new URL(location, latestUrl).toString()
+    }
+  } catch (error) {
+    core.debug(`Failed to resolve latest release: ${error}`)
+    return undefined
+  }
+}
+
+async function restoreCtlCache(
+  installDirectory: string,
+  cacheKey: string
+): Promise<boolean> {
+  try {
+    const restoredKey = await cache.restoreCache([installDirectory], cacheKey)
+    return restoredKey === cacheKey
+  } catch (error) {
+    core.warning(`Failed to restore the CTL cache: ${error}`)
+    return false
+  }
+}
+
+async function saveCtlCache(
+  installDirectory: string,
+  cacheKey: string,
+  version: string
+): Promise<void> {
+  try {
+    await cache.saveCache([installDirectory], cacheKey)
+    core.info(`Cached omnistrate-ctl:${version} for future workflow runs`)
+  } catch (error) {
+    core.warning(`Failed to save the CTL cache: ${error}`)
+  }
+}
+
+function hasInstalledBinaries(installDirectory: string): boolean {
+  const extension = PLATFORM === 'windows' ? '.exe' : ''
+  return (
+    fs.existsSync(path.join(installDirectory, `omnistrate-ctl${extension}`)) &&
+    fs.existsSync(path.join(installDirectory, `omctl${extension}`))
+  )
+}
+
 export function resolveUrl(
   platform: string,
   architecture: string,
@@ -66,7 +196,11 @@ export function resolveUrl(
   return url
 }
 
-async function installCtl(url: string, version: string): Promise<void> {
+async function installCtl(
+  url: string,
+  version: string,
+  installDirectory: string
+): Promise<void> {
   const downloadedPath = await toolCache.downloadTool(url)
   core.info(`Requested omnistrate-ctl:${version} from ${url}`)
 
@@ -102,31 +236,18 @@ async function installCtl(url: string, version: string): Promise<void> {
   )
   core.debug(`Extracted path: ${extractedFile}`)
 
-  // Find the extracted binary
-  const cachedPath = await toolCache.cacheFile(
-    extractedFile,
-    `omnistrate-ctl${extension}`,
-    'omnistrate-ctl',
-    version
-  )
-  core.debug(`Successfully cached omnistrate-ctl to ${cachedPath}`)
-  core.addPath(cachedPath)
-  core.debug('Added omnistrate-ctl to the path')
+  fs.rmSync(installDirectory, { recursive: true, force: true })
+  fs.mkdirSync(installDirectory, { recursive: true })
+  const ctlPath = path.join(installDirectory, `omnistrate-ctl${extension}`)
+  const aliasPath = path.join(installDirectory, `omctl${extension}`)
+  fs.copyFileSync(extractedFile, ctlPath)
+  fs.copyFileSync(extractedFile, aliasPath)
+  core.debug(`Installed omnistrate-ctl and omctl to ${installDirectory}`)
 
-  const cachedPathAlias = await toolCache.cacheFile(
-    extractedFile,
-    `omctl${extension}`,
-    'omctl',
-    version
-  )
-  core.debug(`Successfully cached omctl to ${cachedPathAlias}`)
-  core.addPath(cachedPathAlias)
-  core.debug('Added omctl to the path')
-
-  // Set execution permissions for the cached tool
+  // Set execution permissions for the installed tools
   if (PLATFORM !== 'windows') {
-    fs.chmodSync(path.join(cachedPath, `omnistrate-ctl`), '755')
-    fs.chmodSync(path.join(cachedPathAlias, `omctl`), '755')
+    fs.chmodSync(ctlPath, '755')
+    fs.chmodSync(aliasPath, '755')
   }
 }
 
