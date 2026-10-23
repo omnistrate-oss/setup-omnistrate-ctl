@@ -16,7 +16,8 @@ create and operate Omnistrate services. It supports two authentication methods:
 
 We recommend storing credentials as GitHub Actions secrets. It also allows you
 to optionally set a version of the Omnistrate CTL command to use or uses latest
-by default.
+by default. The downloaded CTL binary is cached between workflow runs by
+default.
 
 > **Note:** By default, the action does **not** run `omnistrate-ctl logout`
 > after the workflow completes. If you want the temporary access token to be
@@ -88,6 +89,19 @@ If you don't want the action to revoke the server-side token after the job
     version: 'v1.0.8'
 ```
 
+#### With binary caching disabled
+
+Caching is enabled by default. To download the CTL binary on every run, set
+`cache` to `false`:
+
+```yaml
+- name: Setup Omnistrate CTL
+  uses: omnistrate-oss/setup-omnistrate-ctl@v1
+  with:
+    api-key: ${{ secrets.OMNISTRATE_API_KEY }}
+    cache: 'false'
+```
+
 ### Email and password authentication
 
 ```yaml
@@ -135,6 +149,7 @@ The following inputs can be used as `step.with` keys:
 | `email`       | String | Email to log in to Omnistrate                                                                                 |
 | `password`    | String | Password to log in to Omnistrate                                                                              |
 | `version`     | String | CTL version (default: `latest`)                                                                               |
+| `cache`       | String | Cache the CTL binary between workflow runs (default: `true`)                                                  |
 | `logout`      | String | Logout after job — revokes **all sessions on all devices** (default: `true`)                                  |
 | `skip-revoke` | String | Skip server-side token revocation — only affects the **current token**, not other sessions (default: `false`) |
 

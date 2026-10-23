@@ -29,6 +29,12 @@ inputs:
       the latest version for the target platform will be installed.
     required: false
     default: 'latest'
+  cache:
+    description: |-
+      Cache the Omnistrate CTL binary between workflow runs to avoid
+      downloading it again. Set to "false" to disable caching.
+    required: false
+    default: 'true'
   logout:
     description: |-
       Whether to run "omnistrate-ctl logout" in the post step to remove
